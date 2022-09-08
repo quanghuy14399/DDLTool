@@ -188,6 +188,7 @@
   .slider.round:before {
     border-radius: 50%;
   }
+
   .switch {
     position: relative;
     display: inline-block;
@@ -399,32 +400,39 @@
     </div>
   </div>
 </body>
-<script src="https://unpkg.com/read-excel-file@4.x/bundle/read-excel-file.min.js"></script>
-
+<script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
 <script>
   // import { readSheetNames } from 'read-excel-file'
   // import readXlsxFile from 'read-excel-file'
-
+  const DEFINE_UNUSED_TABLE = [
+    '表紙',
+    '改修履歴',
+    '修正ルール',
+    'テーブル一覧',
+    '目次',
+  ]
+  const DEFINE_TABLE = 'テーブル定義'
   async function readFile() {
     console.log('vô hàm rồi');
     const input = document.getElementById('input')
 
+    const sheetNames = await readXlsxFile(input.files[0], {
+      getSheets: true
+    }).then(function (sheets) {
+      return sheets.map(function (sheet) {
+        return sheet.name;
+      });
+    });
 
-    readXlsxFile(input.files[0]).then((rows) => {
-      console.log(rows)
+    sheetNames.forEach((element) => {
+      if (DEFINE_UNUSED_TABLE.includes(element)) {
+        return false
+      }
+      console.log(element);
+      readXlsxFile(input.files[0], { sheet: element }).then((rows) => {
+        console.log(rows)
+      })
     })
-
-    // await readSheetNames(input.files[0]).then((sheetNames) => {
-    //   this.sheetNames = sheetNames
-    // })
-    // this.sheetNames.forEach((element) => {
-    //   if (constant.DEFINE_UNUSED_TABLE.includes(element)) {
-    //     return false
-    //   }
-    //   readXlsxFile(input.files[0], { sheet: element }).then((rows) => {
-    //     console.log(rows)
-    //   })
-    // })
   }
 
   function nullToEmptyString() {
