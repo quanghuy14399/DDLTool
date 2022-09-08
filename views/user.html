@@ -189,94 +189,99 @@
     border-radius: 50%;
   }
   .switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
 
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
 
-input:checked + .slider {
-  background-color: #2196F3;
-}
+  input:checked+.slider {
+    background-color: #2196F3;
+  }
 
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
+  input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
 
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
+  input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
 
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
 
-.slider.round:before {
-  border-radius: 50%;
-}
+  .slider.round:before {
+    border-radius: 50%;
+  }
 
-.icon-enabled, .button-table {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  .icon-enabled,
+  .button-table {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-.icon-enabled {
-  padding-right: 10px;
-}
+  .icon-enabled {
+    padding-right: 10px;
+  }
 
-.mx-auto {
-  margin: 0 auto;
-}
-.save-table .block-input{
-  margin-top: 20px;
-}
-.row {
-  display: flex;
-  justify-content: flex-start;
-  gap: 100px;
-}
-.text-center {
-  text-align: center;
-}
-.title-small {
-  font-size: 16px;
-  font-weight: 700;
-  padding-right: 20px;
-}
+  .mx-auto {
+    margin: 0 auto;
+  }
+
+  .save-table .block-input {
+    margin-top: 20px;
+  }
+
+  .row {
+    display: flex;
+    justify-content: flex-start;
+    gap: 100px;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .title-small {
+    font-size: 16px;
+    font-weight: 700;
+    padding-right: 20px;
+  }
 </style>
 
 <body>
@@ -360,7 +365,7 @@ input:checked + .slider:before {
         <div class="upload-file">
           <h2 class="title-upload">Upload File</h2>
           <div class="border-upload">
-            <input id="input" type="file" name="excel" class="display-none" @change="readFile" />
+            <input id="input" type="file" name="excel" class="display-none" onchange="readFile()" />
             <label for="input">
               <div class="img-upload">
                 <img src="/images/upload-icon.png" alt="Upload" />
@@ -394,5 +399,38 @@ input:checked + .slider:before {
     </div>
   </div>
 </body>
+<script src="https://unpkg.com/read-excel-file@4.x/bundle/read-excel-file.min.js"></script>
+
+<script>
+  // import { readSheetNames } from 'read-excel-file'
+  // import readXlsxFile from 'read-excel-file'
+
+  async function readFile() {
+    console.log('vô hàm rồi');
+    const input = document.getElementById('input')
+
+
+    readXlsxFile(input.files[0]).then((rows) => {
+      console.log(rows)
+    })
+
+    // await readSheetNames(input.files[0]).then((sheetNames) => {
+    //   this.sheetNames = sheetNames
+    // })
+    // this.sheetNames.forEach((element) => {
+    //   if (constant.DEFINE_UNUSED_TABLE.includes(element)) {
+    //     return false
+    //   }
+    //   readXlsxFile(input.files[0], { sheet: element }).then((rows) => {
+    //     console.log(rows)
+    //   })
+    // })
+  }
+
+  function nullToEmptyString() {
+    return value === null ? '' : value
+  }
+
+</script>
 
 </html>
