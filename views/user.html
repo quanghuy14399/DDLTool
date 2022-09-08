@@ -1,12 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <h1>aaaaa</h1>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+<style lang="scss">
+  .container {
+    justify-content: space-between;
+  }
+
+  .space {
+    height: 20px;
+  }
+
+  .w-200 {
+    width: 200px;
+  }
+
+  .table {
+    border: 1px solid #8ea8bf;
+    border-radius: 20px;
+    padding: 20px 10px;
+    padding-right: 0;
+  }
+
+  .border-upload {
+    text-align: center;
+    border: 1px dashed #8ea8bf;
+    border-radius: 20px;
+    padding: 20px 10px;
+  }
+
+  #customers {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  #customers td,
+  #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  #customers tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  #customers tr:hover {
+    background-color: #ddd;
+  }
+
+  #customers th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #8ea8bf;
+    color: black;
+  }
+
+  .container {
+    display: flex;
+  }
+
+  .sidebar-left {
+    width: 60%;
+  }
+
+  .sidebar-right {
+    width: 30%;
+  }
+
+  .title-table {
+    text-align: left;
+  }
+
+  .display-none {
+    display: none;
+  }
+
+  .sidebar-right .upload-file .img-upload img {
+    width: 50px;
+  }
+
+  .button {
+    background-color: #13aa52;
+    border: 1px solid #13aa52;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 2px 4px 0;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Akzidenz Grotesk BQ Medium', -apple-system, BlinkMacSystemFont,
+      sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    outline: none;
+    outline: 0;
+    padding: 10px 25px;
+    text-align: center;
+    transform: translateY(0);
+    transition: transform 150ms, box-shadow 150ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  .button-37:hover {
+    box-shadow: rgba(0, 0, 0, 0.15) 0 3px 9px 0;
+    transform: translateY(-2px);
+  }
+
+  @media (min-width: 768px) {
+    .button-37 {
+      padding: 10px 30px;
+    }
+  }
+
+  .mt-20 {
+    margin-top: 20px;
+  }
+
+  .detail-table .table .detail-information {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  input:checked+.slider {
+    background-color: #2196F3;
+  }
+
+  input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+
+  input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  .switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.icon-enabled, .button-table {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-enabled {
+  padding-right: 10px;
+}
+
+.mx-auto {
+  margin: 0 auto;
+}
+.save-table .block-input{
+  margin-top: 20px;
+}
+.row {
+  display: flex;
+  justify-content: flex-start;
+  gap: 100px;
+}
+.text-center {
+  text-align: center;
+}
+.title-small {
+  font-size: 16px;
+  font-weight: 700;
+  padding-right: 20px;
+}
+</style>
+
+<body>
+  <div>
+    <h1 class="text-center">DDL Tool</h1>
+    <div class="container">
+      <section class="sidebar-left">
+        <div class="history-table">
+          <h2 class="title-table">HISTORY TABLE</h2>
+          <div class="table">
+            <table id="customers">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Ver.</th>
+                  <th>Date</th>
+                  <th>Table Name</th>
+                  <th>Table Define Name</th>
+                  <th>History</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>1.0</td>
+                  <td>30/08/2022</td>
+                  <td>Acount</td>
+                  <td>Acount</td>
+                  <td>
+                    <input type="checkbox" name="history" id="history">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="space"></div>
+        <div class="detail-table">
+          <h2 class="title-table">DETAIL TABLE</h2>
+          <div class="table">
+            <div class="detail-information align-center mb-5">
+              <p class="mb-0">
+                <strong>Table:</strong> Account
+                <span><strong>Version:</strong> 1.0</span>
+              </p>
+              <div class="button-table d-flex">
+                <div class="button w-16"><span>Save</span></div>
+                <div class="icon-enabled">
+                  <p class="mb-0 ml-2 mr-2"><strong>Edit</strong></p>
+                  <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <table id="customers">
+              <thead>
+                <tr>
+                  <th>COLUMN NAME</th>
+                  <th>DATA TYPE</th>
+                  <th>SIZE</th>
+                  <th>KEY</th>
+                  <th>ALLOW NULL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Account</td>
+                  <td>varchar</td>
+                  <td>50</td>
+                  <td><input type="checkbox" name="history1" id="history1"></td>
+                  <td><input type="checkbox" name="history2" id="history2"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <section class="sidebar-right">
+        <div class="upload-file">
+          <h2 class="title-upload">Upload File</h2>
+          <div class="border-upload">
+            <input id="input" type="file" name="excel" class="display-none" @change="readFile" />
+            <label for="input">
+              <div class="img-upload">
+                <img src="/images/upload-icon.png" alt="Upload" />
+              </div>
+              <p>Drop or Drap file here</p>
+              <small>File format: xlsx, xls</small>
+              <div class="button mx-auto mt-20 w-200">BROWSE</div>
+              <P>Maximun size: 10MB</P>
+            </label>
+          </div>
+        </div>
+        <div class="save-table">
+          <div class="block-input">
+            <!-- <v-text-field label="SCHEMA名" hide-details="auto" class="mb-6"></v-text-field> -->
+            <label for="SCHEMA"><span class="title-small">SCHEMA名</span><input type="text" id="SCHEMA"></label>
+            <div class="row">
+              <div class="col-md-6">
+                <h2>共通項目</h2>
+                <input type="radio" name="radioGroup" id="" value="1">使用<br />
+                <input type="radio" name="radioGroup" id="" value="0">未使用<br />
+              </div>
+              <div class="col-md-6">
+                <h2>TBL存在チェック</h2>
+                <input type="radio" name="radioGroup1" id="" value="1">必要<br />
+                <input type="radio" name="radioGroup1" id="" value="0">不要<br />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+
 </html>
