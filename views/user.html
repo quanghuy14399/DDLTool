@@ -412,9 +412,31 @@
     '目次',
   ]
   const DEFINE_TABLE = 'テーブル定義'
+  const tbCellCommon = {
+    titleTable: '',
+    nameSystem: '',
+    nameSystemChild: '',
+    nameFunction: '',
+    nameBusiness: '',
+    version: '',
+    admit: '',
+    inspection: '',
+    responsiblePerson: '',
+    registrationNumber: '',
+    referenceNumber: '',
+    maker: '',
+    updater: '',
+    tableName: '',
+    tableDefinitionName: '',
+    nameDB: '',
+    kinds: '',
+    withHistoryTable: '',
+    remarks: '',
+  }
+  const allFieldsTB = []
   async function readFile() {
-    console.log('vô hàm rồi');
     const input = document.getElementById('input')
+    const tbField = {}
 
     const sheetNames = await readXlsxFile(input.files[0], {
       getSheets: true
@@ -428,15 +450,62 @@
       if (DEFINE_UNUSED_TABLE.includes(element)) {
         return false
       }
-      console.log(element);
       readXlsxFile(input.files[0], { sheet: element }).then((rows) => {
-        console.log(rows)
+        tbCellCommon.nameSystem = nullToEmptyString(rows[1][17])
+        tbCellCommon.titleTable = nullToEmptyString(rows[2][1])
+        tbCellCommon.nameSystemChild = nullToEmptyString(rows[3][17])
+        tbCellCommon.nameFunction = nullToEmptyString(rows[1][36])
+        tbCellCommon.nameBusiness = nullToEmptyString(rows[3][36])
+        tbCellCommon.version = nullToEmptyString(rows[3][48])
+        tbCellCommon.admit = nullToEmptyString(rows[3][51])
+        tbCellCommon.inspection = nullToEmptyString(rows[3][54])
+        tbCellCommon.responsiblePerson = nullToEmptyString(rows[3][57])
+        tbCellCommon.registrationNumber = nullToEmptyString(rows[1][70])
+        tbCellCommon.referenceNumber = nullToEmptyString(rows[2][70])
+        tbCellCommon.maker =
+          nullToEmptyString(rows[3][70]) +
+          nullToEmptyString(rows[3][76])
+        tbCellCommon.updater =
+          nullToEmptyString(rows[4][70]) +
+          nullToEmptyString(rows[4][76])
+        tbCellCommon.tableName = nullToEmptyString(rows[6][6])
+        tbCellCommon.tableDefinitionName = nullToEmptyString(rows[6][22])
+        tbCellCommon.nameDB = nullToEmptyString(rows[6][39])
+        let kindRows = ''
+        for (let index = 55; index < 69; index++) {
+          kindRows =
+            nullToEmptyString(kindRows) +
+            nullToEmptyString(rows[6][index])
+        }
+        tbCellCommon.kinds = kindRows
+        tbCellCommon.withHistoryTable = nullToEmptyString(rows[7][9])
+        tbCellCommon.remarks = nullToEmptyString(rows[7][17])
+        // console.log(rows)
+        let fieldTemp = getDataOfField(rows)
+        allFieldsTB.push(({ ...tbCellCommon, ...fieldTemp }))
+        console.log(allFieldsTB, 'allFieldsTB');
+
       })
     })
   }
 
-  function nullToEmptyString() {
+  function nullToEmptyString(value) {
     return value === null ? '' : value
+  }
+
+  function getDataOfField(value) {
+    let position = [3, 16, 26, 30, 35, 45, 48, 54]
+    let data = [];
+    const rowLenght = value.length
+    for (let index = 12; index < rowLenght; index++) {
+      let dataTemp = []
+      position.forEach(el => {
+        if (value[index][el] === null) return
+        dataTemp.push(value[index][el])
+      })
+      if (dataTemp.length > 0) data.push(dataTemp)
+    }
+    return data
   }
 
 </script>
