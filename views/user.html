@@ -532,7 +532,7 @@
           tbCellCommon.remarks = nullToEmptyString(rows[7][17])
           // console.log(rows)
           let fieldTemp = getDataOfField(rows)
-          allFieldsTB.push(({ ...tbCellCommon, ...fieldTemp }))
+          allFieldsTB.push({ ...tbCellCommon, ...fieldTemp })
         })
         .finally(() => {
           
@@ -545,7 +545,7 @@
   }
 
   const allFieldsData = (data) => {
-    console.log(data[0], 'done');
+    console.log(data, 'done');
   }
 
   function nullToEmptyString(value) {
