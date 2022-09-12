@@ -484,10 +484,11 @@
     });
 
     await searchNameTable(sheetNames)
-    await setTimeout(function() {
+    setTimeout(function() {
       console.log(listTableTemp); // will show devices array
-      listTableTemp.forEach((element) => {
-        readXlsxFile(input.files[0], { sheet: element }).then((rows) => {
+      const lastItem = listTableTemp.length - 1
+      listTableTemp.forEach( async (element, index) => {
+        await readXlsxFile(input.files[0], { sheet: element }).then((rows) => {
           tbCellCommon.nameSystem = nullToEmptyString(rows[1][17])
           tbCellCommon.titleTable = nullToEmptyString(rows[2][1])
           tbCellCommon.nameSystemChild = nullToEmptyString(rows[3][17])
@@ -521,14 +522,18 @@
           let fieldTemp = getDataOfField(rows)
           allFieldsTB.push(({ ...tbCellCommon, ...fieldTemp }))
         })
+        .finally(() => {
+          
+        })
+        if(index === lastItem) {
+          allFieldsData(allFieldsTB)
+        }
       })
-      
     },1000)
+  }
 
-    setTimeout(function(){
-      console.log(allFieldsTB); // will show devices array
-    },3000)
-    
+  const allFieldsData = (data) => {
+    console.log(data[0], 'done');
   }
 
   function nullToEmptyString(value) {
