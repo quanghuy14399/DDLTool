@@ -455,6 +455,18 @@
   //   return dataReceived = await dataPromise
   // }
 
+  const eventSaveTable = document.querySelector("#btn-save-table");
+    eventSaveTable.addEventListener("click", () => {
+      console.log("Vào hàm rồi nha");
+      var level = 1;
+      var url = "/test?level=" + escape(level);
+      console.log("client url:", url);
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open("GET", url, false);
+      // xmlHttp.send(null);
+      console.log(xmlHttp.responseText);
+    });
+
   const searchNameTable = async (sheetNames) => {
     await sheetNames.forEach( async (element) => {
       // if (DEFINE_UNUSED_TABLE.includes(element)) {
