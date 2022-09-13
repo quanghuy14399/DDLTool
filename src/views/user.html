@@ -407,6 +407,7 @@
   </div>
 </body>
 <script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
   // import { readSheetNames } from 'read-excel-file'
   // import readXlsxFile from 'read-excel-file'
@@ -456,15 +457,18 @@
   // }
 
   const eventSaveTable = document.querySelector("#btn-save-table");
-    eventSaveTable.addEventListener("click", () => {
-      console.log("Vào hàm rồi nha");
-      var level = 1;
-      var url = "/test?level=" + escape(level);
-      console.log("client url:", url);
-      var xmlHttp = new XMLHttpRequest();
-      xmlHttp.open("GET", url, false);
-      // xmlHttp.send(null);
-      console.log(xmlHttp.responseText);
+  eventSaveTable.addEventListener("click", () => {
+      axios
+        .post("/table-list", {
+          firstName: "Fred",
+          lastName: "Flintstone",
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     });
 
   const searchNameTable = async (sheetNames) => {
