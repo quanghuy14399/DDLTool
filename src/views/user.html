@@ -56,15 +56,14 @@
     overflow: auto;
   }
 
-  table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 9999;
+  th { 
+    position: sticky; 
+    top: -1px; 
   }
   table {
-    overflow: hidden;
     white-space: nowrap;
     border-collapse: collapse;
+    position: relative;
   }
   .border-upload {
     text-align: center;
@@ -75,7 +74,6 @@
 
   #customers {
     font-family: Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
     width: 100%;
   }
 
@@ -333,7 +331,7 @@
           <h2 class="title-table">HISTORY TABLE</h2>
           <div class="table">
             <div class="table-scrollbar">
-              <table id="customers">
+              <table id="customers" class="all">
                 <thead>
                   <tr>
                     <th>No.</th>
@@ -379,26 +377,29 @@
                 </div>
               </div>
             </div>
-            <table id="customers">
-              <thead>
-                <tr>
-                  <th>COLUMN NAME</th>
-                  <th>DATA TYPE</th>
-                  <th>SIZE</th>
-                  <th>KEY</th>
-                  <th>ALLOW NULL</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Account</td>
-                  <td>varchar</td>
-                  <td>50</td>
-                  <td><input type="checkbox" name="history1" id="history1"></td>
-                  <td><input type="checkbox" name="history2" id="history2"></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-scrollbar">
+              <table id="customers" class="one">
+                <thead>
+                  <tr>
+                    <th>COLUMN NAME</th>
+                    <th>DATA TYPE</th>
+                    <th>SIZE</th>
+                    <th>KEY</th>
+                    <th>ALLOW NULL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Account</td>
+                    <td>varchar</td>
+                    <td>50</td>
+                    <td><input type="checkbox" name="history1" id="history1"></td>
+                    <td><input type="checkbox" name="history2" id="history2"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
           </div>
         </div>
       </section>
@@ -499,13 +500,48 @@
           firstName: "Fred",
           lastName: "Flintstone",
         })
-        .then(function (response) {
-          console.log(response);
+        .then((response) => {
+          const positionTableTbody = document.querySelector('#customers.one tbody')
+          const positionTableThead = document.querySelector('#customers.one thead')
+          console.log(response.data)
+          renderTable(response.data, positionTableTbody, positionTableThead)
         })
-        .catch(function (error) {
+        .catch((error) => {
           console.log(error);
         });
     });
+  
+  const renderTable = (datas, tbody, thead) => {
+    let nameHeader = []
+    let stringHeader = ``
+
+    // render data to table tbody 
+    datas.forEach((data, index) => {
+      let subElement = ''
+      for(let key in data) {
+        let value = data[key];
+        if (index === 1)
+          nameHeader.push(key)
+        subElement += `<td>${value}</td>`
+      }
+      tbody.innerHTML += `
+        <tr>
+          ${subElement}
+        </tr>
+      `
+    })
+    // create table thead
+    nameHeader.forEach((header) => {
+      stringHeader += `
+        <th>${header}</th>
+      `
+    })
+    thead.innerHTML = `
+      <tr>
+        ${stringHeader}
+      </tr>
+    `
+  }
 
   const searchNameTable = async (sheetNames) => {
     await sheetNames.forEach( async (element) => {
