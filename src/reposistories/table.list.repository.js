@@ -10,7 +10,7 @@ const getTableListRepository = async (req) => {
     const strSql = mybatisMapper.getStatement(
       "sql",
       "getTableList",
-      req,
+      req.body,
       FORMAT
     );
     console.log("Start table list sql query: ", strSql);
