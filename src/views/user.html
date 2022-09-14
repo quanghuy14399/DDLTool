@@ -320,6 +320,73 @@
     font-weight: 700;
     padding-right: 20px;
   }
+
+  /* modal */
+  .details-modal {
+    background: #fff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    left: 50%;
+    max-width: 90%;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 40vw;
+    text-align: left;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .details-modal .details-modal-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #111827;
+    padding: 1.5em 2em;
+    pointer-events: all;
+  }
+  .details-modal .details-modal-title h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: normal;
+  }
+  .details-modal .details-modal-content {
+    border-top: 1px solid #e0e0e0;
+    padding: 2em;
+    pointer-events: all;
+    overflow: auto;
+  }
+  .details-modal .details-modal-content .field-edit {
+    display: flex;
+    align-items: center;
+  }
+  .details-modal .details-modal-content .field-edit label {
+    display: block;
+    flex: 1;
+  }
+  .details-modal .details-modal-content .field-edit input {
+    display: block;
+    flex: 3;
+    margin-left: 8px;
+    padding: 4px 12px;
+  }
+  .details-modal-overlay {
+    transition: opacity 0.2s ease-out;
+    pointer-events: all;
+    background: rgba(15, 23, 42, 0.8);
+    position: fixed;
+    opacity: 0.5;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+  }
+
+  .d-none {
+    display: none;
+  }
+ 
 </style>
 
 <body>
@@ -371,7 +438,7 @@
                 <div class="icon-enabled">
                   <p class="mb-0 ml-2 mr-2" id="active-history-edit"><strong>Edit</strong></p>
                   <label class="switch">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="enabled-history-edit" checked>
                     <span class="slider round"></span>
                   </label>
                 </div>
@@ -389,13 +456,13 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <!-- <tr>
                     <td>Account</td>
                     <td>varchar</td>
                     <td>50</td>
                     <td><input type="checkbox" name="history1" id="history1"></td>
                     <td><input type="checkbox" name="history2" id="history2"></td>
-                  </tr>
+                  </tr> -->
                 </tbody>
               </table>
             </div>
@@ -441,6 +508,26 @@
         </div>
       </section>
     </div>
+    <section id="modal-popup" class="d-none">
+      <div class="details-modal-overlay"></div>
+      <div class="details-modal">
+        <div class="details-modal-title"> 
+          <h1>Edit Detail Table</h1>
+          <div class="details-modal-close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M13.7071 1.70711C14.0976 1.31658 14.0976 0.683417 13.7071 0.292893C13.3166 -0.0976311 12.6834 -0.0976311 12.2929 0.292893L7 5.58579L1.70711 0.292893C1.31658 -0.0976311 0.683417 -0.0976311 0.292893 0.292893C-0.0976311 0.683417 -0.0976311 1.31658 0.292893 1.70711L5.58579 7L0.292893 12.2929C-0.0976311 12.6834 -0.0976311 13.3166 0.292893 13.7071C0.683417 14.0976 1.31658 14.0976 1.70711 13.7071L7 8.41421L12.2929 13.7071C12.6834 14.0976 13.3166 14.0976 13.7071 13.7071C14.0976 13.3166 14.0976 12.6834 13.7071 12.2929L8.41421 7L13.7071 1.70711Z" fill="black" />
+            </svg>
+          </div>
+        </div>
+        <div class="details-modal-content">
+          <p>
+            You can click the X in the corner or click the overlay to close this modal.
+            Something like this could be useful as a nice way to show additional information,
+            but that's about as far as I would take it. It's just a nice way of styling the details element.
+          </p>
+        </div>
+      </div>
+    </section>
   </div>
 </body>
 <script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
@@ -482,18 +569,34 @@
   const allFieldsTB = []
   const listTableTemp = []
 
-  // const makeAPICall = async () => {
-  //   console.log('Bắt đầu gọi API.');
-  //   const dataPromise = new Promise((resolve, reject) => {
-  //     setTimeout(() => {
-  //       console.log('Nhận data từ API.');
-  //       resolve('Gọi API thành công.');
-  //     }, 2000);
-  //   });
-  //   return dataReceived = await dataPromise
-  // }
+  // modal
+  const popupElement = document.querySelector('#modal-popup')
+  const closePopupElement = popupElement.querySelector('.details-modal-close')
+  
+  // close the modal popup
+  closePopupElement.addEventListener('click', () => {
+    console.log('clicked close popup');
+    popupElement.style.display = 'none'
+  });
 
-  const eventSaveTable = document.querySelector("#btn-save-table");
+  // check enabled edit detail table
+  const editDetailsTable = document.querySelector('#enabled-history-edit')
+  const tableEdit = document.querySelector('#customers.one')
+  editDetailsTable.checked = false
+  tableEdit.style.pointerEvents  = 'none'
+
+  editDetailsTable.addEventListener('change', () => {
+    if (editDetailsTable.checked) {
+      tableEdit.style.pointerEvents  = 'all'
+    } else {
+      tableEdit.style.pointerEvents  = 'none'
+    }
+  })
+
+
+  // catch click btn-save-table
+  const eventSaveTable = document.querySelector("#btn-save-table")
+
   eventSaveTable.addEventListener("click", () => {
       axios
         .post("/table-list", {
@@ -505,6 +608,7 @@
           const positionTableThead = document.querySelector('#customers.one thead')
           console.log(response.data)
           renderTable(response.data, positionTableTbody, positionTableThead)
+          catchElementClicked(response.data)
         })
         .catch((error) => {
           console.log(error);
@@ -514,7 +618,8 @@
   const renderTable = (datas, tbody, thead) => {
     let nameHeader = []
     let stringHeader = ``
-
+    tbody.innerHTML = ``
+    thead.innerHTML = ``
     // render data to table tbody 
     datas.forEach((data, index) => {
       let subElement = ''
@@ -525,7 +630,7 @@
         subElement += `<td>${value}</td>`
       }
       tbody.innerHTML += `
-        <tr>
+        <tr id="${index}">
           ${subElement}
         </tr>
       `
@@ -553,13 +658,13 @@
           const rowLenght = rows.length
           for (let index = 7; index < rowLenght; index++) {
             if (rows[index][3] === null) return
-            listTableTemp.push(`${nullToEmptyString(rows[index][3])}_${nullToEmptyString(rows[index][8])}`)
+            listTableTemp.push(`${nullToEmptyString(rows[index][3]) ? nullToEmptyString(rows[index][3]) + '_' : ''}${nullToEmptyString(rows[index][8])}`)
           }
         })
       }
     })
   }
-  async function readFile() {
+  const readFile = async () => {
     const input = document.getElementById('input')
     const tbField = {}
     
@@ -624,11 +729,11 @@
     console.log(data[0], 'done');
   }
 
-  function nullToEmptyString(value) {
+  const nullToEmptyString = (value) => {
     return value === null ? '' : value
   }
 
-  function getDataOfField(value) {
+  const getDataOfField = (value) => {
     const position = [3, 16, 26, 30, 33, 35, 37, 39, 41, 43, 45, 48, 51, 54]
     const keyP = [35, 37, 39, 41, 43]
     const data = [];
@@ -645,6 +750,33 @@
     }
     return data
   }
+
+  const catchElementClicked = (data) => {
+    const elementClided = document.querySelectorAll('#customers.one tbody tr')
+    elementClided.forEach((element, index) => {
+      element.addEventListener('click', () => {
+        console.log(element.getAttribute('id')  + ' clicked');
+        console.log(data[element.getAttribute('id')])
+        popupElement.style.display = 'block'
+        const positionRenderData = document.querySelector('.details-modal-content')
+        const dataRender = data[element.getAttribute('id')]
+        let templatedData = ``
+        for (const key in dataRender) {
+          if (Object.hasOwnProperty.call(dataRender, key)) {
+            templatedData += `
+              <div class="field-edit">
+                <label id="${key}">${key}</label>
+                <input type=${typeof dataRender[key]} id="${key}" name="${key}" value="${dataRender[key]}">
+              </div>
+              <div class="space"></div>
+            `
+          }
+        }
+        positionRenderData.innerHTML = templatedData
+      })
+    })
+  }
+  
 </script>
 
 </html>
