@@ -4,7 +4,7 @@
     <select id='getTableList'>
         SELECT
            *
-        FROM MST_TRH_TDB 
+        FROM RRK_MST_DDL_CONF_TABLE 
         WHERE 1=1
     </select>
 </mapper>

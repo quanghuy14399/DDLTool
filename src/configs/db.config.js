@@ -4,7 +4,7 @@ const sql = require("mssql/msnodesqlv8");
 var config = {
   user: process.env.USER || "sa",
   password: process.env.PASSWORD || "123456",
-  database: process.env.DATABASE || "SagawaCoreSystem",
+  database: process.env.DATABASE || "SagawaTableCoreSystem",
   driver: process.env.DRIVER || "msnodesqlv8",
   server: process.env.SERVER || "localhost",
   options: {
