@@ -8,6 +8,10 @@
   <title>Document</title>
 </head>
 <style>
+  * {
+    box-sizing: border-box;
+  }
+
   .container {
     justify-content: space-between;
   }
@@ -52,13 +56,14 @@
   }
 
   .table .table-scrollbar {
-    height: 200px;
+    height: 300px;
     overflow: auto;
   }
 
   th { 
     position: sticky; 
-    top: -1px; 
+    top: -1px;
+    z-index: 2;
   }
   table {
     white-space: nowrap;
@@ -337,6 +342,7 @@
     max-height: 90vh;
     display: flex;
     flex-direction: column;
+    z-index: 3;
   }
   .details-modal .details-modal-title {
     display: flex;
@@ -568,6 +574,9 @@
   const list_Name_Table = []
   const allFieldsTB = []
   const listTableTemp = []
+  let dataBaseSelected = {}
+  let indexSelected = 0
+  let cellEdit = {}
 
   // modal
   const popupElement = document.querySelector('#modal-popup')
@@ -576,6 +585,21 @@
   // close the modal popup
   closePopupElement.addEventListener('click', () => {
     console.log('clicked close popup');
+    const elementData = popupElement.querySelectorAll('input')
+    elementData.forEach((element) => {
+      let value = element.value
+      const idValue = element.getAttribute('id')
+      cellEdit = {
+        ...cellEdit,
+        [`${idValue}`] : value
+      }
+    })
+    dataBaseSelected.tableColInfo[indexSelected] = cellEdit
+    const positionTableTbody = document.querySelector('#customers.one tbody')
+    const positionTableThead = document.querySelector('#customers.one thead')
+    // render detail table
+    renderTable(dataBaseSelected.tableColInfo, positionTableTbody, positionTableThead)
+    catchElementClicked(dataBaseSelected.tableColInfo)
     popupElement.style.display = 'none'
   });
 
@@ -584,7 +608,6 @@
   const tableEdit = document.querySelector('#customers.one')
   editDetailsTable.checked = false
   tableEdit.style.pointerEvents  = 'none'
-
   editDetailsTable.addEventListener('change', () => {
     if (editDetailsTable.checked) {
       tableEdit.style.pointerEvents  = 'all'
@@ -593,27 +616,68 @@
     }
   })
 
+  // call data from DB
+  const callDB = async () => {
+    await axios
+      .post("/table-list", {})
+      .then((response) => {
+        const positionTableTbody = document.querySelector('#customers.all tbody')
+        const positionTableThead = document.querySelector('#customers.all thead')
+        console.log(response.data, 'done processing')
+        
+        // render table all from DB
+        renderTable(response.data, positionTableTbody, positionTableThead)
+        const elementClicked = document.querySelectorAll('#customers.all tbody tr')
+        elementClicked.forEach((element, index) => {
+          element.addEventListener('click', () => {
+            dataBaseSelected = {
+              ...response.data[index]
+            }
+            let payload
+            const positionTableTbody = document.querySelector('#customers.one tbody')
+            const positionTableThead = document.querySelector('#customers.one thead')
+            // render detail table
+            renderTable(response.data[index].tableColInfo, positionTableTbody, positionTableThead)
+            catchElementClicked(response.data[index].tableColInfo)
+          })
+        })
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  callDB()
 
+  const catchElementClicked = (data) => {
+    const elementClided = document.querySelectorAll('#customers.one tbody tr')
+    elementClided.forEach((element, index) => {
+      element.addEventListener('click', () => {
+        indexSelected = index
+        popupElement.style.display = 'block'
+        const positionRenderData = document.querySelector('.details-modal-content')
+        const dataRender = data[element.getAttribute('id')]
+        let templatedData = ``
+        for (const key in dataRender) {
+          if (Object.hasOwnProperty.call(dataRender, key)) {
+            templatedData += `
+              <div class="field-edit">
+                <label id="${key}">${key}</label>
+                <input type=${typeof dataRender[key]} id="${key}" name="${key}" value="${dataRender[key]}">
+              </div>
+              <div class="space"></div>
+            `
+          }
+        }
+        positionRenderData.innerHTML = templatedData
+      })
+    })
+  }
+  
   // catch click btn-save-table
   const eventSaveTable = document.querySelector("#btn-save-table")
-
   eventSaveTable.addEventListener("click", () => {
-      axios
-        .post("/table-list", {
-          firstName: "Fred",
-          lastName: "Flintstone",
-        })
-        .then((response) => {
-          const positionTableTbody = document.querySelector('#customers.one tbody')
-          const positionTableThead = document.querySelector('#customers.one thead')
-          console.log(response.data)
-          renderTable(response.data, positionTableTbody, positionTableThead)
-          catchElementClicked(response.data)
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    });
+    console.log('clicked save table');
+  });
   
   const renderTable = (datas, tbody, thead) => {
     let nameHeader = []
@@ -627,7 +691,11 @@
         let value = data[key];
         if (index === 1)
           nameHeader.push(key)
-        subElement += `<td>${value}</td>`
+        if (key === 'tableColInfo') {
+          subElement += `<td><div class="button">Detail</div></td>`
+        } else {
+          subElement += `<td>${value}</td>`
+        }
       }
       tbody.innerHTML += `
         <tr id="${index}">
@@ -636,7 +704,7 @@
       `
     })
     // create table thead
-    nameHeader.forEach((header) => {
+    nameHeader.forEach((header, index) => {
       stringHeader += `
         <th>${header}</th>
       `
@@ -664,6 +732,7 @@
       }
     })
   }
+  
   const readFile = async () => {
     const input = document.getElementById('input')
     const tbField = {}
@@ -726,7 +795,7 @@
   }
 
   const allFieldsData = (data) => {
-    console.log(data[0], 'done');
+    console.log(data, 'done');
   }
 
   const nullToEmptyString = (value) => {
@@ -751,32 +820,11 @@
     return data
   }
 
-  const catchElementClicked = (data) => {
-    const elementClided = document.querySelectorAll('#customers.one tbody tr')
-    elementClided.forEach((element, index) => {
-      element.addEventListener('click', () => {
-        console.log(element.getAttribute('id')  + ' clicked');
-        console.log(data[element.getAttribute('id')])
-        popupElement.style.display = 'block'
-        const positionRenderData = document.querySelector('.details-modal-content')
-        const dataRender = data[element.getAttribute('id')]
-        let templatedData = ``
-        for (const key in dataRender) {
-          if (Object.hasOwnProperty.call(dataRender, key)) {
-            templatedData += `
-              <div class="field-edit">
-                <label id="${key}">${key}</label>
-                <input type=${typeof dataRender[key]} id="${key}" name="${key}" value="${dataRender[key]}">
-              </div>
-              <div class="space"></div>
-            `
-          }
-        }
-        positionRenderData.innerHTML = templatedData
-      })
-    })
-  }
-  
+  // call btn-save
+  const btnSave = document.querySelector('#btn-save');
+  btnSave.addEventListener('click', () => {
+    console.log('btnSave clicked');
+  })
 </script>
 
 </html>
