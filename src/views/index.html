@@ -375,7 +375,14 @@
     display: block;
     flex: 3;
     margin-left: 8px;
-    padding: 4px 12px;
+    padding: 5px 12px;
+  }
+  .details-modal .details-modal-content .field-edit .input-checkbox {
+    flex: 3;
+  }
+  .details-modal .details-modal-content .field-edit input[type = 'checkbox'] {
+    padding: 0;
+    margin: 0;
   }
   .details-modal-overlay {
     transition: opacity 0.2s ease-out;
@@ -659,9 +666,22 @@
         let templatedData = ``
         for (const key in dataRender) {
           if (Object.hasOwnProperty.call(dataRender, key)) {
+            // create input type checkbox
+            if(key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
+              templatedData += `
+                <div class="field-edit">
+                  <label for="${key}">${key}</label>
+                  <div class="input-checkbox">
+                  <input type="checkbox" id="${key}" name="${key}" ${dataRender[key] === '1' ? 'checked' : ''} value="${dataRender[key]}">
+                  </div>
+                </div>
+                <div class="space"></div>
+              `
+            }
+            else 
             templatedData += `
               <div class="field-edit">
-                <label id="${key}">${key}</label>
+                <label for="${key}">${key}</label>
                 <input type=${typeof dataRender[key]} id="${key}" name="${key}" value="${dataRender[key]}">
               </div>
               <div class="space"></div>
@@ -669,6 +689,19 @@
           }
         }
         positionRenderData.innerHTML = templatedData
+
+        // addEventListener change on checkbox input
+        for (const key in dataRender) {
+          if (Object.hasOwnProperty.call(dataRender, key)) {
+            if(key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
+              const checkbox = document.querySelector('#' + key);
+              console.log(checkbox + 'có chạy ko đm ?')
+              checkbox.addEventListener('change',  () => {
+                checkbox.value = checkbox.checked ? 1 : 0;
+              });
+            }
+          }
+        }
       })
     })
   }
@@ -693,6 +726,8 @@
           nameHeader.push(key)
         if (key === 'tableColInfo') {
           subElement += `<td><div class="button">Detail</div></td>`
+        } if (key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
+          subElement += `<td><input type="checkbox" ${value === '1' ? 'checked' : ''} disabled="true" /></td>`
         } else {
           subElement += `<td>${value}</td>`
         }
