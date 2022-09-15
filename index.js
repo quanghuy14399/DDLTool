@@ -33,8 +33,8 @@ app.use(express.urlencoded({ extended: true }));
 /**
  * Routes Definitions
  */
-router.get("/user", (req, res) => {
-  res.sendFile(path.join(__dirname + "/src/views/user.html"));
+router.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname + "/src/views/index.html"));
 });
 
 /*
@@ -50,14 +50,6 @@ router.get("/user", (req, res) => {
  *****************************/
 const tableListController = require("src/controllers/table.list.controller.js");
 router.post("/table-list", tableListController.get);
-
-app.get("/", async (req, res) => {
-  const dbServerTime = await dbConfig.getDBServerTime();
-  res.render("index", {
-    title: "XLSX",
-    data: dbServerTime.data,
-  });
-});
 
 /**
  * Server Activation
