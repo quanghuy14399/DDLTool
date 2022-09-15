@@ -399,6 +399,12 @@
   .d-none {
     display: none;
   }
+
+  .button.disabled {
+    pointer-events: none;
+    background-color: #555;
+    border: #555;
+  }
  
 </style>
 
@@ -447,7 +453,7 @@
                 <span><strong>Version:</strong> 1.0</span>
               </p>
               <div class="button-table d-flex">
-                <div class="button w-16" id="btn-save"><span>Save</span></div>
+                <div class="button w-16 disabled" id="btn-re-execute" disabled><span>Re-Excute</span></div>
                 <div class="icon-enabled">
                   <p class="mb-0 ml-2 mr-2" id="active-history-edit"><strong>Edit</strong></p>
                   <label class="switch">
@@ -590,8 +596,7 @@
   const closePopupElement = popupElement.querySelector('.details-modal-close')
   
   // close the modal popup
-  closePopupElement.addEventListener('click', () => {
-    console.log('clicked close popup');
+  const closeTheModalPopup = () => {
     const elementData = popupElement.querySelectorAll('input')
     elementData.forEach((element) => {
       let value = element.value
@@ -607,6 +612,11 @@
     // render detail table
     renderTable(dataBaseSelected.tableColInfo, positionTableTbody, positionTableThead)
     catchElementClicked(dataBaseSelected.tableColInfo)
+    const enableBtnReExecute = document.querySelector('#btn-re-execute')
+    enableBtnReExecute.classList.remove('disabled')
+    popupElement.style.display = 'none'
+  }
+  closePopupElement.addEventListener('click', () => {
     popupElement.style.display = 'none'
   });
 
@@ -688,26 +698,28 @@
             `
           }
         }
-        positionRenderData.innerHTML = templatedData
+        positionRenderData.innerHTML = templatedData + `<div class="button" id="save-data-change">Save</div>`
 
         // addEventListener change on checkbox input
         for (const key in dataRender) {
           if (Object.hasOwnProperty.call(dataRender, key)) {
             if(key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
               const checkbox = document.querySelector('#' + key);
-              console.log(checkbox + 'có chạy ko đm ?')
               checkbox.addEventListener('change',  () => {
                 checkbox.value = checkbox.checked ? 1 : 0;
               });
             }
           }
         }
+
+        const saveDataChange = document.querySelector('#save-data-change')
+        saveDataChange.addEventListener('click', closeTheModalPopup)
       })
     })
   }
   
-  // catch click btn-save-table
-  const eventSaveTable = document.querySelector("#btn-save-table")
+  // catch click btn-re-execute
+  const eventSaveTable = document.querySelector("#btn-re-execute")
   eventSaveTable.addEventListener("click", () => {
     console.log('clicked save table');
   });
@@ -726,7 +738,7 @@
           nameHeader.push(key)
         if (key === 'tableColInfo') {
           subElement += `<td><div class="button">Detail</div></td>`
-        } if (key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
+        } else if (key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
           subElement += `<td><input type="checkbox" ${value === '1' ? 'checked' : ''} disabled="true" /></td>`
         } else {
           subElement += `<td>${value}</td>`
@@ -855,8 +867,8 @@
     return data
   }
 
-  // call btn-save
-  const btnSave = document.querySelector('#btn-save');
+  // call btn-re-execute
+  const btnSave = document.querySelector('#btn-re-execute');
   btnSave.addEventListener('click', () => {
     console.log('btnSave clicked');
   })
