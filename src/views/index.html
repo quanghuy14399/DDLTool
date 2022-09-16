@@ -837,9 +837,7 @@
           tbCellCommon.withHistoryTable = nullToEmptyString(rows[7][9])
           tbCellCommon.remarks = nullToEmptyString(rows[7][17])
           // console.log(rows)
-          let fieldTemp = [
-            ...getDataOfField(rows)
-          ]
+          let fieldTemp = getDataOfField(rows)
           let fieldKey= [
             ...getDataOfFieldKey(rows)
           ]
@@ -862,8 +860,6 @@
 
   const allFieldsData = (data) => {
     console.log(data, 'done');
-    console.log(data[0].tableDefinitionName, 'done');
-    console.log(data[0][0], 'done');
   }
 
   const nullToEmptyString = (value) => {
@@ -916,17 +912,31 @@
   const getDataOfField = (value) => {
     const POSITION = [3, 16, 26, 30, 33, 35, 37, 39, 41, 43, 45, 48, 51, 54]
     const KEY_P_S = [35, 37, 39, 41, 43]
+    const FIELD_NAME = [ 'columnDefineName', 'columnName', 'dataType', 'size', 'primaryKey', 'keyS1' ,'keyS2' ,'keyS3' ,'keyS4' ,'allowNulls' , 'defaultValue', 'identity', 'description']
     const data = [];
     const rowLenght = value.length
-    for (let index = 12; index < rowLenght; index++) {
+    for (let indexSub = 12; indexSub < rowLenght; indexSub++) {
       let dataTemp = []
-      POSITION.forEach(el => {
-        if ((value[index][3]) === null) return
-        dataTemp.push(value[index][el])
+      const obj = {};
+
+      POSITION.forEach((el, index, array) => {
+        if ((value[indexSub][3]) === null) {
+          return
+        }
+        
+        dataTemp.push(value[indexSub][el])
+
+        if (index === array.length -1) {
+          FIELD_NAME.forEach((element, idx) => {
+            obj[element] = dataTemp[idx];
+          });
+          data.push(obj)
+        }
       })
-      if (dataTemp.length > 0) data.push(dataTemp)
+      if (indexSub === rowLenght -1) {
+        return data
+      }
     }
-    return data
   }
 
   // call btn-re-execute
