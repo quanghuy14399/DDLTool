@@ -586,7 +586,7 @@
   const SHEET_LIST_NAME_TABLE = 'テーブル一覧'
   const list_Name_Table = []
   const allFieldsTB = []
-  const listTableTemp = []
+  // const listTableTemp = []
   let dataBaseSelected = {}
   let indexSelected = 0
   let cellEdit = {}
@@ -763,7 +763,9 @@
     `
   }
 
-  const searchNameTable = async (sheetNames) => {
+  const searchNameTable = async (sheetNames, symbol) => {
+    const data = []
+    console.log(symbol, 'lol');
     await sheetNames.forEach( async (element) => {
       // if (DEFINE_UNUSED_TABLE.includes(element)) {
       //   return false
@@ -773,12 +775,18 @@
           const rowLenght = rows.length
           for (let index = 7; index < rowLenght; index++) {
             if (rows[index][3] === null) return
-            listTableTemp.push(`${nullToEmptyString(rows[index][3]) ? nullToEmptyString(rows[index][3]) + '_' : ''}${nullToEmptyString(rows[index][8])}`)
+            if (symbol === 0)
+              data.push(`${nullToEmptyString(rows[index][3]) ? nullToEmptyString(rows[index][3]) + '_' : ''}${nullToEmptyString(rows[index][8])}`)
+            else if (symbol === 1) {
+              data.push(`${nullToEmptyString(rows[index][3]) ? nullToEmptyString(rows[index][3]) + ' ' : ''}${nullToEmptyString(rows[index][8])}`)
+            }
           }
         })
       }
     })
+    return data
   }
+  // listTableTemp
   
   const readFile = async () => {
     const input = document.getElementById('input')
@@ -792,11 +800,12 @@
       });
     });
 
-    await searchNameTable(sheetNames)
-    setTimeout(function() {
+    const listTableTemp = await searchNameTable(sheetNames, 0)
+    setTimeout(async function() {
       console.log(listTableTemp); // will show devices array
       const lastItem = listTableTemp.length - 1
-      listTableTemp.forEach( async (element, index) => {
+      let error = false
+      await listTableTemp.forEach( async (element, index) => {
         await readXlsxFile(input.files[0], { sheet: element }).then((rows) => {
           tbCellCommon.nameSystem = nullToEmptyString(rows[1][17])
           tbCellCommon.titleTable = nullToEmptyString(rows[2][1])
@@ -828,38 +837,91 @@
           tbCellCommon.withHistoryTable = nullToEmptyString(rows[7][9])
           tbCellCommon.remarks = nullToEmptyString(rows[7][17])
           // console.log(rows)
-          let fieldTemp = getDataOfField(rows)
-          allFieldsTB.push(({ ...tbCellCommon, ...fieldTemp }))
+          let fieldTemp = [
+            ...getDataOfField(rows)
+          ]
+          let fieldKey= [
+            ...getDataOfFieldKey(rows)
+          ]
+          allFieldsTB.push({ ...tbCellCommon, fieldTemp , fieldKey })
+          if(index === lastItem) {
+            allFieldsData(allFieldsTB)
+          }
+        })
+        .catch((e) => {
+          console.log(e, 'Exception');
+          error = true
         })
         .finally(() => {
           
         })
-        if(index === lastItem) {
-          allFieldsData(allFieldsTB)
-        }
+        
       })
     },1000)
   }
 
   const allFieldsData = (data) => {
     console.log(data, 'done');
+    console.log(data[0].tableDefinitionName, 'done');
+    console.log(data[0][0], 'done');
   }
 
   const nullToEmptyString = (value) => {
     return value === null ? '' : value
   }
 
+  const getDataOfFieldKey = (value) => {
+    const KEY_P_S = [35, 37, 39, 41, 43]
+    const keyP = []
+    const keyS1 = []
+    const keyS2 = []
+    const keyS3 = []
+    const keyS4 = []
+    const data = [];
+    const rowLenght = value.length
+    KEY_P_S.forEach((element) => {
+      for (let indexSub = 12; indexSub < rowLenght; indexSub++) {
+        if ((value[indexSub][3]) === null) return
+        
+        if (value[indexSub][element]) {
+          if (element === 35) {
+            let dataTemp = value[indexSub][16]
+            keyP.push(dataTemp)
+          }
+          if (element === 37) {
+            let dataTemp = value[indexSub][16]
+            keyS1.push(dataTemp)
+          }
+          if (element === 39) {
+            let dataTemp = value[indexSub][16]
+            keyS2.push(dataTemp)
+          }
+          if (element === 41) {
+            let dataTemp = value[indexSub][16]
+            keyS3.push(dataTemp)
+          }
+          if (element === 43) {
+            let dataTemp = value[indexSub][16]
+            keyS4.push(dataTemp)
+          }
+          
+        }
+      }
+    })
+    data.push(keyP,keyS1,keyS2,keyS3,keyS4)
+    
+    return data
+  }
+
   const getDataOfField = (value) => {
-    const position = [3, 16, 26, 30, 33, 35, 37, 39, 41, 43, 45, 48, 51, 54]
-    const keyP = [35, 37, 39, 41, 43]
+    const POSITION = [3, 16, 26, 30, 33, 35, 37, 39, 41, 43, 45, 48, 51, 54]
+    const KEY_P_S = [35, 37, 39, 41, 43]
     const data = [];
     const rowLenght = value.length
     for (let index = 12; index < rowLenght; index++) {
       let dataTemp = []
-      position.forEach(el => {
+      POSITION.forEach(el => {
         if ((value[index][3]) === null) return
-        if (value[index][el] === null && !keyP.includes(el)) return
-        if (value[index][el] === null && keyP.includes(el)) value[index][el] = 0
         dataTemp.push(value[index][el])
       })
       if (dataTemp.length > 0) data.push(dataTemp)
