@@ -910,7 +910,8 @@
   }
 
   const getDataOfField = (value) => {
-    const POSITION = [3, 16, 26, 30, 33, 35, 37, 39, 41, 43, 45, 48, 51, 54]
+    // const POSITION = [3, 16, 26, 30, 33, 35, 37, 39, 41, 43, 45, 48, 51, 54] //có dùng từ viết tắt
+    const POSITION = [3, 16, 26, 30, 35, 37, 39, 41, 43, 45, 48, 51, 54]
     const KEY_P_S = [35, 37, 39, 41, 43]
     const FIELD_NAME = [ 'columnDefineName', 'columnName', 'dataType', 'size', 'primaryKey', 'keyS1' ,'keyS2' ,'keyS3' ,'keyS4' ,'allowNulls' , 'defaultValue', 'identity', 'description']
     const data = [];
@@ -944,6 +945,75 @@
   btnSave.addEventListener('click', () => {
     console.log('btnSave clicked');
   })
+  // btn-save-table
+  const btnSaveTable = document.querySelector('#btn-save-table')
+  btnSaveTable.addEventListener('click', () => {
+    console.count('btn-save-table clicked');
+    console.log(generator());
+  })
+  // generator
+  const generator = () => {
+    const SCHEMA = document.querySelector('#SCHEMA')
+    const toDay = new Date()
+    let fieldScript = allFieldsTB[0].fieldTemp.map((item) => (
+                        `[${item.columnName}] [${item.dataType}]${item.size ? `(${item.size})` : ''} ${item.allowNulls ? 'NOT NULL' : 'NULL'} ${item.defaultValue ? item.defaultValue === '空' ? `DEFAULT ('')` : `DEFAULT (${item.defaultValue})` : ''}
+                        `
+                      ))
+    let keyPScript = allFieldsTB[0].fieldKey[0].map((field, index, arr) => (
+                        field ? `[${field}] ASC
+                        ` : ''
+                      ))
+    let execScript = allFieldsTB[0].fieldTemp.map((item) => (
+                        `EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'${item.columnDefineName}' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'${item.tableDefinitionName}', @level2type=N'COLUMN',@level2name=N'${item.columnName}'
+                        GO
+                        `
+                      ))
+    let keySScript = allFieldsTB[0].fieldKey.map((item, index) => {
+                        if (index === 0) return
+                        return item ? `
+                        /****** Object:  Index [IDX0${index}_${allFieldsTB[0].tableDefinitionName}]    Script Date: ${toDay.toLocaleString()} ******/
+                        DROP INDEX IF EXISTS [IDX0${index}_${allFieldsTB[0].tableDefinitionName}] ON [dbo].[${allFieldsTB[0].tableDefinitionName}]
+                        GO
+
+                        CREATE NONCLUSTERED INDEX [IDX0${index}_${allFieldsTB[0].tableDefinitionName}] ON [dbo].[${allFieldsTB[0].tableDefinitionName}]
+                        (
+                          ${item.map((item) => (
+                            item ? `[${item}] ASC` : ''
+                          ))}
+                        )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+                        GO
+                        ` : '';
+                      })
+    let dataPost = `USE ${SCHEMA.value ? SCHEMA.value : '[SagawaCoreSystem]'}
+          GO
+
+          /****** ${allFieldsTB[0].tableName} ******/
+          /****** Object:  Table [dbo].[${allFieldsTB[0].tableDefinitionName}]    Script Date: ${toDay.toLocaleString()} ******/
+          SET ANSI_NULLS ON
+          GO
+
+          SET QUOTED_IDENTIFIER ON
+          GO
+          DROP TABLE IF EXISTS [dbo].[${allFieldsTB[0].tableDefinitionName}]
+          GO
+
+          CREATE TABLE [dbo].[${allFieldsTB[0].tableDefinitionName}](
+          ${fieldScript}
+          CONSTRAINT [PK_${allFieldsTB[0].tableDefinitionName}] PRIMARY KEY CLUSTERED 
+          (
+          ${keyPScript}
+          )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+          ) ON [PRIMARY]
+          GO
+          )
+          
+          ${execScript}
+          ${keySScript}
+          
+
+           `
+    return dataPost
+  }
 </script>
 
 </html>
