@@ -128,6 +128,10 @@
     width: 50px;
   }
 
+  .sidebar-right .upload-file .img-upload p {
+    margin-top: 10px;
+  }
+
   .button {
     background-color: #13aa52;
     border: 1px solid #13aa52;
@@ -310,6 +314,10 @@
     margin-top: 20px;
   }
 
+  .save-table .block-input input[type='text']  {
+    padding: 5px 12px;
+  }
+
   .row {
     display: flex;
     justify-content: flex-start;
@@ -457,7 +465,7 @@
                 <div class="icon-enabled">
                   <p class="mb-0 ml-2 mr-2" id="active-history-edit"><strong>Edit</strong></p>
                   <label class="switch">
-                    <input type="checkbox" id="enabled-history-edit" checked>
+                    <input type="checkbox" id="enabled-history-edit">
                     <span class="slider round"></span>
                   </label>
                 </div>
@@ -495,12 +503,13 @@
           <div class="border-upload">
             <input id="input" type="file" name="excel" class="display-none" onchange="readFile()" />
             <label for="input">
+              <div class="space"></div>
               <div class="img-upload">
                 <img src="/images/upload-icon.png" alt="Upload" />
               </div>
-              <p>Drop or Drap file here</p>
               <small>File format: xlsx, xls</small>
-              <div class="button mx-auto mt-20 w-200">BROWSE</div>
+              <div class="space"></div>
+              <div class="button mx-auto w-200">BROWSE</div>
               <P>Maximun size: 10MB</P>
             </label>
           </div>
@@ -737,7 +746,8 @@
         if (index === 1)
           nameHeader.push(key)
         if (key === 'tableColInfo') {
-          subElement += `<td><div class="button">Detail</div></td>`
+          // tableColInfo ko render ra table
+          continue
         } else if (key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
           subElement += `<td><input type="checkbox" ${value === '1' ? 'checked' : ''} disabled="true" /></td>`
         } else {
@@ -752,9 +762,10 @@
     })
     // create table thead
     nameHeader.forEach((header, index) => {
-      stringHeader += `
-        <th>${header}</th>
-      `
+      if ( header != 'tableColInfo' )
+        stringHeader += `
+          <th>${header}</th>
+        `
     })
     thead.innerHTML = `
       <tr>
