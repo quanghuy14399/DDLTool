@@ -88,6 +88,10 @@
     padding: 8px;
   }
 
+  #customers td .content {
+    min-width: 200px;
+    white-space: break-spaces;
+  }
   #customers tr:nth-child(even) {
     background-color: #f2f2f2;
   }
@@ -313,7 +317,12 @@
   .row {
     display: flex;
     justify-content: flex-start;
+    align-items: flex-end;
     gap: 100px;
+  }
+
+  .row .col-md-6 h2 {
+    line-height: 32px;
   }
 
   .text-center {
@@ -512,13 +521,13 @@
             <div class="row">
               <div class="col-md-6">
                 <h2>共通項目</h2>
-                <input type="radio" name="radioGroup" id="" value="1">使用<br />
-                <input type="radio" name="radioGroup" id="" value="0">未使用<br />
+                <label for=""><input type="radio" name="radioGroup" id="" value="1">使用<br/></label>
+                <label><input type="radio" name="radioGroup" id="" value="0">未使用</label>
               </div>
               <div class="col-md-6">
                 <h2>TBL存在チェック</h2>
                 <input type="radio" name="radioGroup1" id="" value="1">必要<br />
-                <input type="radio" name="radioGroup1" id="" value="0">不要<br />
+                <input type="radio" name="radioGroup1" id="" value="0">不要
               </div>
             </div>
           </div>
@@ -741,7 +750,7 @@
         } else if (key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
           subElement += `<td><input type="checkbox" ${value === '1' ? 'checked' : ''} disabled="true" /></td>`
         } else {
-          subElement += `<td>${value}</td>`
+          subElement += `<td><div class="content">${value}</div></td>`
         }
       }
       tbody.innerHTML += `
@@ -763,26 +772,40 @@
     `
   }
 
-  const searchNameTable = async (sheetNames, symbol) => {
+  const searchNameTable = async (sheetNames) => {
     const data = []
-    console.log(symbol, 'lol');
-    await sheetNames.forEach( async (element) => {
+    const listTemp = []
+    await sheetNames.forEach( async (element, indexSheet, arr) => {
       // if (DEFINE_UNUSED_TABLE.includes(element)) {
       //   return false
       // }
+      let indexCustom = 0
       if (element === SHEET_LIST_NAME_TABLE) {
         await readXlsxFile(input.files[0], { sheet: element }).then( async (rows) => {
           const rowLenght = rows.length
           for (let index = 7; index < rowLenght; index++) {
             if (rows[index][3] === null) return
-            if (symbol === 0)
-              data.push(`${nullToEmptyString(rows[index][3]) ? nullToEmptyString(rows[index][3]) + '_' : ''}${nullToEmptyString(rows[index][8])}`)
-            else if (symbol === 1) {
-              data.push(`${nullToEmptyString(rows[index][3]) ? nullToEmptyString(rows[index][3]) + ' ' : ''}${nullToEmptyString(rows[index][8])}`)
-            }
+            listTemp.push(`${nullToEmptyString(rows[index][8])}`)
+            indexCustom++
           }
+        }).finally(() => {
+          data.push(...searchSheetName(listTemp, sheetNames))
+          if (!data.length) return alert('Sheet is not available')
         })
       }
+      
+    })
+    return data
+  }
+  // search sheet name 
+  const searchSheetName = (listTemp, sheetNames) => {
+    const data = []
+    listTemp.forEach((sheetNamesSelected, index) => {
+      sheetNames.filter((sheetname) => {
+        if (sheetname.indexOf(sheetNamesSelected) >= 0) {
+          data.push(sheetname)
+        }
+      })
     })
     return data
   }
@@ -800,8 +823,9 @@
       });
     });
 
-    const listTableTemp = await searchNameTable(sheetNames, 0)
+    const listTableTemp = await searchNameTable(sheetNames)
     setTimeout(async function() {
+      if (!listTableTemp.length) return alert('clmmm')
       console.log(listTableTemp); // will show devices array
       const lastItem = listTableTemp.length - 1
       let error = false
@@ -838,9 +862,9 @@
           tbCellCommon.remarks = nullToEmptyString(rows[7][17])
           // console.log(rows)
           let fieldTemp = getDataOfField(rows)
-          let fieldKey= [
+          let fieldKey= {
             ...getDataOfFieldKey(rows)
-          ]
+          }
           allFieldsTB.push({ ...tbCellCommon, fieldTemp , fieldKey })
           if(index === lastItem) {
             allFieldsData(allFieldsTB)
@@ -873,7 +897,7 @@
     const keyS2 = []
     const keyS3 = []
     const keyS4 = []
-    const data = [];
+    const data = {};
     const rowLenght = value.length
     KEY_P_S.forEach((element) => {
       for (let indexSub = 12; indexSub < rowLenght; indexSub++) {
@@ -904,7 +928,11 @@
         }
       }
     })
-    data.push(keyP,keyS1,keyS2,keyS3,keyS4)
+    data.p = keyP
+    data.s1 = keyS1
+    data.s2 = keyS2
+    data.s3 = keyS3
+    data.s4 = keyS4
     
     return data
   }
@@ -949,12 +977,13 @@
   const btnSaveTable = document.querySelector('#btn-save-table')
   btnSaveTable.addEventListener('click', () => {
     console.count('btn-save-table clicked');
-    console.log(generator());
+    // console.log(generator());
   })
   // generator
   const generator = () => {
     const SCHEMA = document.querySelector('#SCHEMA')
     const toDay = new Date()
+    if (!allFieldsTB[0].fieldTemp) return
     let fieldScript = allFieldsTB[0].fieldTemp.map((item) => (
                         `[${item.columnName}] [${item.dataType}]${item.size ? `(${item.size})` : ''} ${item.allowNulls ? 'NOT NULL' : 'NULL'} ${item.defaultValue ? item.defaultValue === '空' ? `DEFAULT ('')` : `DEFAULT (${item.defaultValue})` : ''}
                         `
