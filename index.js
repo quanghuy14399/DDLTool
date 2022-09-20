@@ -41,8 +41,8 @@ router.get("/", (req, res) => {
  ** API Name      : Table Version Registration
  ** Last Modified : 2022-09-12
  *****************************/
-//const tableRegistrationController = require("src/controllers/table.registration.controller.js");
-//router.post("/table-registration", tableRegistrationController.execute);
+const tableRegistrationController = require("src/controllers/table.registration.controller.js");
+router.post("/table-registration", tableRegistrationController.get);
 
 /*
  ** API Name      : Table Version List
@@ -58,4 +58,3 @@ app.use(router);
 app.listen(port, () => {
   console.log(`Listening to requests on http://localhost:${port}`);
 });
-

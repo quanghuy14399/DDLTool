@@ -5,9 +5,8 @@ module.exports = {
     try {
       console.log("Table List", req.body);
 
-      const result = await tableRegistrationService.getTableRegistrationService(
-        req
-      );
+      const result =
+        await tableRegistrationService.executeTableRegistrationService(req);
 
       res.status(result.httpStatuscode);
       res.json(result.data);

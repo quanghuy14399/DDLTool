@@ -3,7 +3,6 @@ const tableListReposistory = require("src/reposistories/table.list.repository.js
 const getTableListService = async (req) => {
   console.log(" Start table list service... ");
   try {
-    //return await tableListReposistory.getTableListRepository(req);
     const result = await tableListReposistory.getTableListRepository(req);
     let data = [];
     result.data.forEach(function (element) {
@@ -12,7 +11,7 @@ const getTableListService = async (req) => {
         schemaName: element.SCHEMA_NM,
         tableName: element.TABLE_NM,
         description: element.DESCRIPTION,
-        tableColInfo: JSON.parse(element.TABLE_COL_INF),
+        tableColInfos: JSON.parse(element.TABLE_COL_INF),
         createUserId: element.CRE_USER_ID,
         createDateTime: element.CRE_DATETIME,
         updateUserId: element.UPD_USER_ID,

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dbshema">
+   
+    <insert id='createTable'> 
+       
+        /****** ${strTBLNM} ******/   
+        /****** Object:  Table [dbo].[${strTBL}]    Script Date: ${excuteDate} ******/
+        SET ANSI_NULLS ON
+        GO
+        SET QUOTED_IDENTIFIER ON
+        GO
+        ${strDRPTBL}
+        GO
+        CREATE TABLE [dbo].[${strTBL}]
+          (
+            <foreach item="value" collection="arrTableColInfos" separator=",">
+                ${value}
+            </foreach>
+            , CONSTRAINT [PK_DAT_MITSUMORI_HEAD] PRIMARY KEY CLUSTERED 
+            (   
+
+                <foreach item="item" index="index" collection="arrP" separator=",">
+                    [${item}] ASC
+                </foreach>
+
+            )
+
+            <if test="optSeqKeyFlg == 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = ON) ON [PRIMARY]
+            </if>
+            <if test="optSeqKeyFlg != 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+            </if>
+        
+        ) ON [PRIMARY]
+
+        GO
+        <foreach item="item" index="index" collection="arrColumnInfos" separator="" >
+            EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'${item.columnName}' , @level0type=N'SCHEMA',@level0name=N'dbo'
+            , @level1type=N'TABLE',@level1name=N'${strTBL}', @level2type=N'COLUMN',@level2name=N'${item.columnDefineName}'
+            GO
+        </foreach>
+
+        <if test="strDRPIDX01 != null and strDRPIDX01 != ''">
+         /****** Object:  Index [IDX01_#{strTBL}]    Script Date: #{excuteDate} ******/
+            #{strDRPIDX01}
+            GO
+            CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
+            (
+             <foreach item="item" index="index" collection="arrS1" separator=",">
+	            [${item}] ASC
+             </foreach>
+             )
+             <if test="optSeqKeyFlg == 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = ON) ON [PRIMARY]
+            </if>
+            <if test="optSeqKeyFlg != 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+            </if>
+             GO
+        </if>
+
+        <if test="strDRPIDX02 != null and strDRPIDX02 != ''">
+         /****** Object:  Index [IDX02_${strTBL}]    Script Date: ${excuteDate} ******/
+            ${strDRPIDX02}
+            GO
+             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[#{strTBL]
+            (
+             <foreach item="item" index="index" collection="${arrS2}" separator=",">
+	            [${item}] ASC
+             </foreach>
+            )
+            <if test="optSeqKeyFlg == 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = ON) ON [PRIMARY]
+            </if>
+            <if test="optSeqKeyFlg != 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+            </if>
+            GO
+        </if>
+
+        <if test="strDRPIDX03 != null and strDRPIDX03 != ''">
+         /****** Object:  Index [IDX03_${strTBL}]    Script Date: ${excuteDate} ******/
+            ${strDRPIDX03}
+            GO
+             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
+            (
+             <foreach item="item" index="index" collection="arrS3" separator=",">
+	            [${item}] ASC
+             </foreach>
+             )
+             <if test="optSeqKeyFlg == 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = ON) ON [PRIMARY]
+            </if>
+            <if test="optSeqKeyFlg != 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+            </if>
+             GO
+        </if>
+
+        <if test="strDRPIDX04 != null and strDRPIDX04 != ''">
+         /****** Object:  Index [IDX04_${strTBL}]    Script Date: ${excuteDate} ******/
+            #{strDRPIDX04}
+            GO
+             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
+            (
+             <foreach item="item" index="index" collection="arrS4" separator=",">
+	            [#{item}] ASC
+             </foreach>
+             )
+             <if test="optSeqKeyFlg == 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = ON) ON [PRIMARY]
+            </if>
+            <if test="optSeqKeyFlg != 1">
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+            </if>
+             GO
+        </if>
+
+    </insert>
+</mapper>

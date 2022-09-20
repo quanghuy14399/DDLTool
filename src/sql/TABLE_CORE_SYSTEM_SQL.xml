@@ -6,5 +6,10 @@
            *
         FROM RRK_MST_DDL_CONF_TABLE 
         WHERE 1=1
+        ORDER BY REREKI_SEQ DESC
     </select>
+
+    <insert id='addOrEditTableInfos'> 
+      
+    </insert>
 </mapper>
