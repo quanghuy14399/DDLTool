@@ -13,7 +13,7 @@
   }
 
   .container {
-    justify-content: space-between;
+    justify-content: space-around;
   }
 
   .space {
@@ -88,6 +88,10 @@
     padding: 8px;
   }
 
+  #customers td .content {
+    min-width: 200px;
+    white-space: break-spaces;
+  }
   #customers tr:nth-child(even) {
     background-color: #f2f2f2;
   }
@@ -126,6 +130,10 @@
 
   .sidebar-right .upload-file .img-upload img {
     width: 50px;
+  }
+
+  .sidebar-right .upload-file .img-upload p {
+    margin-top: 10px;
   }
 
   .button {
@@ -310,10 +318,19 @@
     margin-top: 20px;
   }
 
+  .save-table .block-input input[type='text']  {
+    padding: 5px 12px;
+  }
+
   .row {
     display: flex;
     justify-content: flex-start;
+    align-items: flex-end;
     gap: 100px;
+  }
+
+  .row .col-md-6 h2 {
+    line-height: 32px;
   }
 
   .text-center {
@@ -457,7 +474,7 @@
                 <div class="icon-enabled">
                   <p class="mb-0 ml-2 mr-2" id="active-history-edit"><strong>Edit</strong></p>
                   <label class="switch">
-                    <input type="checkbox" id="enabled-history-edit" checked>
+                    <input type="checkbox" id="enabled-history-edit">
                     <span class="slider round"></span>
                   </label>
                 </div>
@@ -495,12 +512,13 @@
           <div class="border-upload">
             <input id="input" type="file" name="excel" class="display-none" onchange="readFile()" />
             <label for="input">
+              <div class="space"></div>
               <div class="img-upload">
                 <img src="/images/upload-icon.png" alt="Upload" />
               </div>
-              <p>Drop or Drap file here</p>
               <small>File format: xlsx, xls</small>
-              <div class="button mx-auto mt-20 w-200">BROWSE</div>
+              <div class="space"></div>
+              <div class="button mx-auto w-200">BROWSE</div>
               <P>Maximun size: 10MB</P>
             </label>
           </div>
@@ -512,13 +530,13 @@
             <div class="row">
               <div class="col-md-6">
                 <h2>共通項目</h2>
-                <input type="radio" name="radioGroup" id="" value="1">使用<br />
-                <input type="radio" name="radioGroup" id="" value="0">未使用<br />
+                <label><input type="radio" name="cmnItemFlg" value="1">使用<br/></label>
+                <label><input type="radio" name="cmnItemFlg" value="0" checked>未使用</label>
               </div>
               <div class="col-md-6">
                 <h2>TBL存在チェック</h2>
-                <input type="radio" name="radioGroup1" id="" value="1">必要<br />
-                <input type="radio" name="radioGroup1" id="" value="0">不要<br />
+                <label><input type="radio" name="checkExistTable" value="1">必要<br /></label>
+                <label><input type="radio" name="checkExistTable" value="0"checked>不要</label>
               </div>
             </div>
           </div>
@@ -586,7 +604,7 @@
   const SHEET_LIST_NAME_TABLE = 'テーブル一覧'
   const list_Name_Table = []
   const allFieldsTB = []
-  const listTableTemp = []
+  // const listTableTemp = []
   let dataBaseSelected = {}
   let indexSelected = 0
   let cellEdit = {}
@@ -606,7 +624,9 @@
         [`${idValue}`] : value
       }
     })
-    dataBaseSelected.tableColInfo[indexSelected] = cellEdit
+    dataBaseSelected.tableColInfo[indexSelected] = {
+      ...cellEdit
+    }
     const positionTableTbody = document.querySelector('#customers.one tbody')
     const positionTableThead = document.querySelector('#customers.one thead')
     // render detail table
@@ -721,7 +741,10 @@
   // catch click btn-re-execute
   const eventSaveTable = document.querySelector("#btn-re-execute")
   eventSaveTable.addEventListener("click", () => {
-    console.log('clicked save table');
+    console.log('clicked btn-re-execute');
+    
+    const dataExecute = JSON.stringify(dataBaseSelected);
+    console.log(dataExecute, 'data execute');
   });
   
   const renderTable = (datas, tbody, thead) => {
@@ -737,11 +760,12 @@
         if (index === 1)
           nameHeader.push(key)
         if (key === 'tableColInfo') {
-          subElement += `<td><div class="button">Detail</div></td>`
+          // tableColInfo ko render ra table
+          continue
         } else if (key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
           subElement += `<td><input type="checkbox" ${value === '1' ? 'checked' : ''} disabled="true" /></td>`
         } else {
-          subElement += `<td>${value}</td>`
+          subElement += `<td><div class="content">${value}</div></td>`
         }
       }
       tbody.innerHTML += `
@@ -752,9 +776,10 @@
     })
     // create table thead
     nameHeader.forEach((header, index) => {
-      stringHeader += `
-        <th>${header}</th>
-      `
+      if ( header != 'tableColInfo' )
+        stringHeader += `
+          <th>${header}</th>
+        `
     })
     thead.innerHTML = `
       <tr>
@@ -764,21 +789,43 @@
   }
 
   const searchNameTable = async (sheetNames) => {
-    await sheetNames.forEach( async (element) => {
+    const data = []
+    const listTemp = []
+    await sheetNames.forEach( async (element, indexSheet, arr) => {
       // if (DEFINE_UNUSED_TABLE.includes(element)) {
       //   return false
       // }
+      let indexCustom = 0
       if (element === SHEET_LIST_NAME_TABLE) {
         await readXlsxFile(input.files[0], { sheet: element }).then( async (rows) => {
           const rowLenght = rows.length
           for (let index = 7; index < rowLenght; index++) {
             if (rows[index][3] === null) return
-            listTableTemp.push(`${nullToEmptyString(rows[index][3]) ? nullToEmptyString(rows[index][3]) + '_' : ''}${nullToEmptyString(rows[index][8])}`)
+            listTemp.push(`${nullToEmptyString(rows[index][8])}`)
+            indexCustom++
           }
+        }).finally(() => {
+          data.push(...searchSheetName(listTemp, sheetNames))
+          if (!data.length) return alert('Sheet is not available')
         })
       }
+      
     })
+    return data
   }
+  // search sheet name 
+  const searchSheetName = (listTemp, sheetNames) => {
+    const data = []
+    listTemp.forEach((sheetNamesSelected, index) => {
+      sheetNames.filter((sheetname) => {
+        if (sheetname.indexOf(sheetNamesSelected) >= 0) {
+          data.push(sheetname)
+        }
+      })
+    })
+    return data
+  }
+  // listTableTemp
   
   const readFile = async () => {
     const input = document.getElementById('input')
@@ -792,11 +839,13 @@
       });
     });
 
-    await searchNameTable(sheetNames)
-    setTimeout(function() {
+    const listTableTemp = await searchNameTable(sheetNames)
+    setTimeout(async function() {
+      if (!listTableTemp.length) return alert('Sheet is not available')
       console.log(listTableTemp); // will show devices array
       const lastItem = listTableTemp.length - 1
-      listTableTemp.forEach( async (element, index) => {
+      let error = false
+      await listTableTemp.forEach( async (element, index) => {
         await readXlsxFile(input.files[0], { sheet: element }).then((rows) => {
           tbCellCommon.nameSystem = nullToEmptyString(rows[1][17])
           tbCellCommon.titleTable = nullToEmptyString(rows[2][1])
@@ -828,15 +877,23 @@
           tbCellCommon.withHistoryTable = nullToEmptyString(rows[7][9])
           tbCellCommon.remarks = nullToEmptyString(rows[7][17])
           // console.log(rows)
-          let fieldTemp = getDataOfField(rows)
-          allFieldsTB.push(({ ...tbCellCommon, ...fieldTemp }))
+          let tableColInfos = getDataOfField(rows)
+          let fieldKey= {
+            ...getDataOfFieldKey(rows)
+          }
+          allFieldsTB.push({ ...tbCellCommon, tableColInfos , fieldKey })
+          if(index === lastItem) {
+            allFieldsData(allFieldsTB)
+          }
+        })
+        .catch((e) => {
+          console.log(e, 'Exception');
+          error = true
         })
         .finally(() => {
           
         })
-        if(index === lastItem) {
-          allFieldsData(allFieldsTB)
-        }
+        
       })
     },1000)
   }
@@ -849,29 +906,387 @@
     return value === null ? '' : value
   }
 
-  const getDataOfField = (value) => {
-    const position = [3, 16, 26, 30, 33, 35, 37, 39, 41, 43, 45, 48, 51, 54]
-    const keyP = [35, 37, 39, 41, 43]
-    const data = [];
+  const getDataOfFieldKey = (value) => {
+    const KEY_P_S = [35, 37, 39, 41, 43]
+    const keyP = []
+    const keyS1 = []
+    const keyS2 = []
+    const keyS3 = []
+    const keyS4 = []
+    const data = {};
     const rowLenght = value.length
-    for (let index = 12; index < rowLenght; index++) {
-      let dataTemp = []
-      position.forEach(el => {
-        if ((value[index][3]) === null) return
-        if (value[index][el] === null && !keyP.includes(el)) return
-        if (value[index][el] === null && keyP.includes(el)) value[index][el] = 0
-        dataTemp.push(value[index][el])
-      })
-      if (dataTemp.length > 0) data.push(dataTemp)
-    }
+    KEY_P_S.forEach((element) => {
+      for (let indexSub = 12; indexSub < rowLenght; indexSub++) {
+        if ((value[indexSub][3]) === null) return
+        
+        if (value[indexSub][element]) {
+          if (element === 35) {
+            let dataTemp = value[indexSub][16]
+            keyP.push(dataTemp)
+          }
+          if (element === 37) {
+            let dataTemp = value[indexSub][16]
+            keyS1.push(dataTemp)
+          }
+          if (element === 39) {
+            let dataTemp = value[indexSub][16]
+            keyS2.push(dataTemp)
+          }
+          if (element === 41) {
+            let dataTemp = value[indexSub][16]
+            keyS3.push(dataTemp)
+          }
+          if (element === 43) {
+            let dataTemp = value[indexSub][16]
+            keyS4.push(dataTemp)
+          }
+          
+        }
+      }
+    })
+    data.p = keyP
+    data.s1 = keyS1
+    data.s2 = keyS2
+    data.s3 = keyS3
+    data.s4 = keyS4
+    
     return data
   }
 
-  // call btn-re-execute
-  const btnSave = document.querySelector('#btn-re-execute');
-  btnSave.addEventListener('click', () => {
-    console.log('btnSave clicked');
+  const getDataOfField = (value) => {
+    // const POSITION = [3, 16, 26, 30, 33, 35, 37, 39, 41, 43, 45, 48, 51, 54] //có dùng từ viết tắt
+    const POSITION = [3, 16, 26, 30, 35, 37, 39, 41, 43, 45, 48, 51, 54]
+    const KEY_P_S = [35, 37, 39, 41, 43]
+    const FIELD_NAME = [ 'columnName', 'columnDefineName', 'dataType', 'size', 'primaryKey', 'keyS1' ,'keyS2' ,'keyS3' ,'keyS4' ,'allowNulls' , 'defaultValue', 'identity', 'description']
+    const data = [];
+    const rowLenght = value.length
+    for (let indexSub = 12; indexSub < rowLenght; indexSub++) {
+      let dataTemp = []
+      const obj = {};
+      if ((value[indexSub][3]) === null) return data
+      POSITION.forEach((el, index, array) => {
+        if (el === 48) {
+          value[indexSub][el] === null ? value[indexSub][el] = null : value[indexSub][el] === "空" ? value[indexSub][el] = '' : value[indexSub][el]
+        }
+        dataTemp.push(value[indexSub][el])
+
+        if (index === array.length -1) {
+          FIELD_NAME.forEach((element, idx) => {
+            obj[element] = dataTemp[idx];
+          });
+          data.push(obj)
+        }
+      })
+      // if (indexSub === rowLenght -1) {
+      //   return data
+      // }
+    }
+  }
+
+  // btn-save-table
+  const btnSaveTable = document.querySelector('#btn-save-table')
+  btnSaveTable.addEventListener('click', () => {
+    console.count('btn-save-table clicked');
+    generator()
   })
+  // generator
+  const generator = async () => {
+    const SCHEMA = document.querySelector('#SCHEMA')
+    const cmnItemFlg = document.querySelectorAll('input[name="cmnItemFlg"]')
+    const checkExistTable = document.querySelectorAll('input[name="checkExistTable"]')
+    const toDay = new Date()
+    const commonItem = [
+      {
+        columnName: "削除フラグ",
+        columnDefineName: "DEL_FLG",
+        dataType: "char",
+        size: 1,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: "×",
+        defaultValue: 0,
+        identity: null,
+        description: "0：未削除\n1：削除済"
+      },
+      {
+        columnName: "作成者ID",
+        columnDefineName: "CRE_USER_ID",
+        dataType: "char",
+        size: 6,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時"
+      },
+      {
+        columnName: "作成日時",
+        columnDefineName: "CRE_DATETIME",
+        dataType: "datetime2",
+        size: null,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時"
+      },
+      {
+        columnName: "作成プログラムID",
+        columnDefineName: "CRE_PROG_ID",
+        dataType: "varchar",
+        size: 13,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時"
+      },
+      {
+        columnName: "更新者ID",
+        columnDefineName: "UPD_USER_ID",
+        dataType: "char",
+        size: 6,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時、UPDATE時"
+      },
+      {
+        columnName: "更新日時",
+        columnDefineName: "UPD_DATETIME",
+        dataType: "datetime2",
+        size: null,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時、UPDATE時"
+      },
+      {
+        columnName: "更新プログラムID",
+        columnDefineName: "UPD_PROG_ID",
+        dataType: "varchar",
+        size: 13,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時、UPDATE時"
+      },
+      {
+        columnName: "削除者ID",
+        columnDefineName: "DEL_USER_ID",
+        dataType: "char",
+        size: 6,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "論理削除UPDATE時"
+      },
+      {
+        columnName: "削除日時",
+        columnDefineName: "DEL_DATETIME",
+        dataType: "datetime2",
+        size: null,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "論理削除UPDATE時"
+      },
+      {
+        columnName: "削除プログラムID",
+        columnDefineName: "DEL_PROG_ID",
+        dataType: "varchar",
+        size: 13,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "論理削除UPDATE時"
+      },
+      {
+        columnName: "バージョン",
+        columnDefineName: "VERSION",
+        dataType: "bigint",
+        size: null,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: "×",
+        defaultValue: 1,
+        identity: null,
+        description: "更新時、削除時に1カウントアップする"
+      },
+
+    ]
+    // toDay.toLocaleString()
+    if (!allFieldsTB) return
+    await allFieldsTB.forEach((fieldTable, index, arr) => {
+      fieldTable.excuteDate = toDay.toLocaleString()
+      fieldTable.schemaName = SCHEMA.value ? SCHEMA.value : 'SagawaCoreSystem'
+      cmnItemFlg.forEach((ele, index, arr) => {
+        if (ele.checked) fieldTable.cmnItemFlg = ele.value
+        if (index === arr.length -1) {
+          if (fieldTable.cmnItemFlg === "1") {
+            fieldTable.tableColInfos.push(...commonItem)
+          }
+        }
+      })
+      
+      checkExistTable.forEach(ele => {
+        if (ele.checked) fieldTable.checkExistTable = ele.value
+      })
+      // check RRK
+      if (fieldTable.withHistoryTable) {
+        const tableDuplicate = {
+          ...fieldTable
+        }
+        tableDuplicate.tableDefinitionName = 'RRK_' + fieldTable.tableDefinitionName
+        tableDuplicate.fieldKey.p = ['RIREKI_SEQ']
+        
+        const RIREKI_SEQ = {
+          columnName: "履歴SEQ",
+          columnDefineName: "RIREKI_SEQ",
+          dataType: "bigint",
+          size: null,
+          primaryKey: 1,
+          keyS1: null,
+          keyS2: null,
+          keyS3: null,
+          keyS4: null,
+          allowNulls: "×",
+          defaultValue: null,
+          identity: "1,1",
+          description: null
+        }
+        const RIREKI_CRE_DATETIME = {
+          columnName: "履歴作成日時",
+          columnDefineName: "RIREKI_CRE_DATETIME",
+          dataType: "datetime2",
+          size: null,
+          primaryKey: null,
+          keyS1: null,
+          keyS2: null,
+          keyS3: null,
+          keyS4: null,
+          allowNulls: "×",
+          defaultValue: null,
+          identity: null,
+          description: null
+        }
+        tableDuplicate.tableColInfos.push(RIREKI_SEQ)
+        tableDuplicate.tableColInfos.push(RIREKI_CRE_DATETIME)
+        allFieldsTB[arr.length] = {
+          ...tableDuplicate
+        }
+          
+      }
+    })
+    
+    console.log(allFieldsTB,'after all');
+    // let fieldScript = allFieldsTB[0].fieldTemp.map((item) => (
+    //                     `[${item.columnName}] [${item.dataType}]${item.size ? `(${item.size})` : ''} ${item.allowNulls ? 'NOT NULL' : 'NULL'} ${item.defaultValue ? item.defaultValue === '空' ? `DEFAULT ('')` : `DEFAULT (${item.defaultValue})` : ''}
+    //                     `
+    //                   ))
+    // let keyPScript = allFieldsTB[0].fieldKey[0].map((field, index, arr) => (
+    //                     field ? `[${field}] ASC
+    //                     ` : ''
+    //                   ))
+    // let execScript = allFieldsTB[0].fieldTemp.map((item) => (
+    //                     `EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'${item.columnDefineName}' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'${item.tableDefinitionName}', @level2type=N'COLUMN',@level2name=N'${item.columnName}'
+    //                     GO
+    //                     `
+    //                   ))
+    // let keySScript = allFieldsTB[0].fieldKey.map((item, index) => {
+    //                     if (index === 0) return
+    //                     return item ? `
+    //                     /****** Object:  Index [IDX0${index}_${allFieldsTB[0].tableDefinitionName}]    Script Date: ${toDay.toLocaleString()} ******/
+    //                     DROP INDEX IF EXISTS [IDX0${index}_${allFieldsTB[0].tableDefinitionName}] ON [dbo].[${allFieldsTB[0].tableDefinitionName}]
+    //                     GO
+
+    //                     CREATE NONCLUSTERED INDEX [IDX0${index}_${allFieldsTB[0].tableDefinitionName}] ON [dbo].[${allFieldsTB[0].tableDefinitionName}]
+    //                     (
+    //                       ${item.map((item) => (
+    //                         item ? `[${item}] ASC` : ''
+    //                       ))}
+    //                     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+    //                     GO
+    //                     ` : '';
+    //                   })
+    // let dataPost = `USE ${SCHEMA.value ? SCHEMA.value : '[SagawaCoreSystem]'}
+    //       GO
+
+    //       /****** ${allFieldsTB[0].tableName} ******/
+    //       /****** Object:  Table [dbo].[${allFieldsTB[0].tableDefinitionName}]    Script Date: ${toDay.toLocaleString()} ******/
+    //       SET ANSI_NULLS ON
+    //       GO
+
+    //       SET QUOTED_IDENTIFIER ON
+    //       GO
+    //       DROP TABLE IF EXISTS [dbo].[${allFieldsTB[0].tableDefinitionName}]
+    //       GO
+
+    //       CREATE TABLE [dbo].[${allFieldsTB[0].tableDefinitionName}](
+    //       ${fieldScript}
+    //       CONSTRAINT [PK_${allFieldsTB[0].tableDefinitionName}] PRIMARY KEY CLUSTERED 
+    //       (
+    //       ${keyPScript}
+    //       )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+    //       ) ON [PRIMARY]
+    //       GO
+    //       )
+          
+    //       ${execScript}
+    //       ${keySScript}
+          
+
+    //        `
+    // return dataPost
+  }
 </script>
 
 </html>
