@@ -965,7 +965,9 @@
       const obj = {};
       if ((value[indexSub][3]) === null) return data
       POSITION.forEach((el, index, array) => {
-        
+        if (el === 48) {
+          value[indexSub][el] === null ? value[indexSub][el] = null : value[indexSub][el] === "空" ? value[indexSub][el] = '' : value[indexSub][el]
+        }
         dataTemp.push(value[indexSub][el])
 
         if (index === array.length -1) {
