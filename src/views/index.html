@@ -624,7 +624,9 @@
         [`${idValue}`] : value
       }
     })
-    dataBaseSelected.tableColInfo[indexSelected] = cellEdit
+    dataBaseSelected.tableColInfo[indexSelected] = {
+      ...cellEdit
+    }
     const positionTableTbody = document.querySelector('#customers.one tbody')
     const positionTableThead = document.querySelector('#customers.one thead')
     // render detail table
@@ -739,7 +741,10 @@
   // catch click btn-re-execute
   const eventSaveTable = document.querySelector("#btn-re-execute")
   eventSaveTable.addEventListener("click", () => {
-    console.log('clicked save table');
+    console.log('clicked btn-re-execute');
+    
+    const dataExecute = JSON.stringify(dataBaseSelected);
+    console.log(dataExecute, 'data execute');
   });
   
   const renderTable = (datas, tbody, thead) => {
@@ -958,11 +963,8 @@
     for (let indexSub = 12; indexSub < rowLenght; indexSub++) {
       let dataTemp = []
       const obj = {};
-
+      if ((value[indexSub][3]) === null) return data
       POSITION.forEach((el, index, array) => {
-        if ((value[indexSub][3]) === null) {
-          return
-        }
         
         dataTemp.push(value[indexSub][el])
 
@@ -973,17 +975,12 @@
           data.push(obj)
         }
       })
-      if (indexSub === rowLenght -1) {
-        return data
-      }
+      // if (indexSub === rowLenght -1) {
+      //   return data
+      // }
     }
   }
 
-  // call btn-re-execute
-  const btnSave = document.querySelector('#btn-re-execute');
-  btnSave.addEventListener('click', () => {
-    console.log('btnSave clicked');
-  })
   // btn-save-table
   const btnSaveTable = document.querySelector('#btn-save-table')
   btnSaveTable.addEventListener('click', () => {
@@ -991,20 +988,193 @@
     generator()
   })
   // generator
-  const generator = () => {
+  const generator = async () => {
     const SCHEMA = document.querySelector('#SCHEMA')
     const cmnItemFlg = document.querySelectorAll('input[name="cmnItemFlg"]')
     const checkExistTable = document.querySelectorAll('input[name="checkExistTable"]')
     const toDay = new Date()
+    const commonItem = [
+      {
+        columnName: "削除フラグ",
+        columnDefineName: "DEL_FLG",
+        dataType: "char",
+        size: 1,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: "×",
+        defaultValue: 0,
+        identity: null,
+        description: "0：未削除\n1：削除済"
+      },
+      {
+        columnName: "作成者ID",
+        columnDefineName: "CRE_USER_ID",
+        dataType: "char",
+        size: 6,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時"
+      },
+      {
+        columnName: "作成日時",
+        columnDefineName: "CRE_DATETIME",
+        dataType: "datetime2",
+        size: null,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時"
+      },
+      {
+        columnName: "作成プログラムID",
+        columnDefineName: "CRE_PROG_ID",
+        dataType: "varchar",
+        size: 13,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時"
+      },
+      {
+        columnName: "更新者ID",
+        columnDefineName: "UPD_USER_ID",
+        dataType: "char",
+        size: 6,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時、UPDATE時"
+      },
+      {
+        columnName: "更新日時",
+        columnDefineName: "UPD_DATETIME",
+        dataType: "datetime2",
+        size: null,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時、UPDATE時"
+      },
+      {
+        columnName: "更新プログラムID",
+        columnDefineName: "UPD_PROG_ID",
+        dataType: "varchar",
+        size: 13,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "INSERT時、UPDATE時"
+      },
+      {
+        columnName: "削除者ID",
+        columnDefineName: "DEL_USER_ID",
+        dataType: "char",
+        size: 6,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "論理削除UPDATE時"
+      },
+      {
+        columnName: "削除日時",
+        columnDefineName: "DEL_DATETIME",
+        dataType: "datetime2",
+        size: null,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "論理削除UPDATE時"
+      },
+      {
+        columnName: "削除プログラムID",
+        columnDefineName: "DEL_PROG_ID",
+        dataType: "varchar",
+        size: 13,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: null,
+        defaultValue: null,
+        identity: null,
+        description: "論理削除UPDATE時"
+      },
+      {
+        columnName: "バージョン",
+        columnDefineName: "VERSION",
+        dataType: "bigint",
+        size: null,
+        primaryKey: null,
+        keyS1: null,
+        keyS2: null,
+        keyS3: null,
+        keyS4: null,
+        allowNulls: "×",
+        defaultValue: 1,
+        identity: null,
+        description: "更新時、削除時に1カウントアップする"
+      },
+
+    ]
     // toDay.toLocaleString()
     if (!allFieldsTB) return
-    allFieldsTB.forEach((fieldTable, index, arr) => {
+    await allFieldsTB.forEach((fieldTable, index, arr) => {
       fieldTable.excuteDate = toDay.toLocaleString()
       fieldTable.schemaName = SCHEMA.value ? SCHEMA.value : 'SagawaCoreSystem'
-      // return
-      cmnItemFlg.forEach(ele => {
+      cmnItemFlg.forEach((ele, index, arr) => {
         if (ele.checked) fieldTable.cmnItemFlg = ele.value
+        if (index === arr.length -1) {
+          if (fieldTable.cmnItemFlg === "1") {
+            fieldTable.tableColInfos.push(...commonItem)
+          }
+        }
       })
+      
       checkExistTable.forEach(ele => {
         if (ele.checked) fieldTable.checkExistTable = ele.value
       })
@@ -1015,9 +1185,43 @@
         }
         tableDuplicate.tableDefinitionName = 'RRK_' + fieldTable.tableDefinitionName
         tableDuplicate.fieldKey.p = ['RIREKI_SEQ']
+        
+        const RIREKI_SEQ = {
+          columnName: "履歴SEQ",
+          columnDefineName: "RIREKI_SEQ",
+          dataType: "bigint",
+          size: null,
+          primaryKey: 1,
+          keyS1: null,
+          keyS2: null,
+          keyS3: null,
+          keyS4: null,
+          allowNulls: "×",
+          defaultValue: null,
+          identity: "1,1",
+          description: null
+        }
+        const RIREKI_CRE_DATETIME = {
+          columnName: "履歴作成日時",
+          columnDefineName: "RIREKI_CRE_DATETIME",
+          dataType: "datetime2",
+          size: null,
+          primaryKey: null,
+          keyS1: null,
+          keyS2: null,
+          keyS3: null,
+          keyS4: null,
+          allowNulls: "×",
+          defaultValue: null,
+          identity: null,
+          description: null
+        }
+        tableDuplicate.tableColInfos.push(RIREKI_SEQ)
+        tableDuplicate.tableColInfos.push(RIREKI_CRE_DATETIME)
         allFieldsTB[arr.length] = {
           ...tableDuplicate
         }
+          
       }
     })
     
