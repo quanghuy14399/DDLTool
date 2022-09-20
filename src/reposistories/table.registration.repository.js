@@ -4,7 +4,7 @@ const dbConfig = require("src/configs/db.config.js");
 mybatisMapper.createMapper(["src/sql/DATABASE_ON_SHEMA_SQL.xml"]);
 
 const executeTableRegistrationRepository = async (req) => {
-  console.log("Start table registration repository...", req);
+  // console.log("Start table registration repository...", req);
   const FORMAT = { language: "sql", indent: "  " };
 
   try {
@@ -14,8 +14,10 @@ const executeTableRegistrationRepository = async (req) => {
       req,
       FORMAT
     );
-    console.log("Start table registration sql query: ", strSql);
-    const result = await dbConfig.createOrUpdateTable(strSql, req.strDB);
+    const stringAfter = strSql.replace(/@+\s/g, '@').replace(/\[+\s/g, '[').replace(/\s+\]/g, ']').replace(/N+\s+\'/g, `N'`).replace(/\sGO(?! \s)/g, '\n\rGo\n')
+    console.log("Start table registration sql query: ", stringAfter);
+
+    const result = await dbConfig.createOrUpdateTable(stringAfter, req.strDB)
 
     return {
       httpStatuscode: 200,
