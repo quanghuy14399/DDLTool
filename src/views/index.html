@@ -673,7 +673,7 @@
             const positionTableTbody = document.querySelector('#customers.one tbody')
             const positionTableThead = document.querySelector('#customers.one thead')
             // render detail table
-            renderTable(response.data[index].tableColInfo, positionTableTbody, positionTableThead)
+            renderTable(response.data[index].tableColInfos, positionTableTbody, positionTableThead)
             catchElementClicked(response.data[index].tableColInfo)
           })
         })
