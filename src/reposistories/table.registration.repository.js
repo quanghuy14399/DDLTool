@@ -14,7 +14,7 @@ const executeTableRegistrationRepository = async (req) => {
       req,
       FORMAT
     );
-    const stringAfter = strSql.replace(/@+\s/g, '@').replace(/\[+\s/g, '[').replace(/\s+\]/g, ']').replace(/N+\s+\'/g, `N'`).replace(/\sGO(?! \s)/g, '\n\rGo\n')
+    const stringAfter = strSql.replace(/@+\s/g, '@').replace(/\[+\s/g, '[').replace(/\s+\]/g, ']').replace(/N+\s+\'/g, `N'`).replace(/\sGO(?! \s)/g, '\n')
     console.log("Start table registration sql query: ", stringAfter);
 
     const result = await dbConfig.createOrUpdateTable(stringAfter, req.strDB)

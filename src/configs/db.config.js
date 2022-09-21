@@ -59,12 +59,12 @@ const createOrUpdateTable = async (sqlQuery, schemaName) => {
   try {
     await sql.connect(configDefault);
     console.log("Query executing...");
-    const result = await sql.query(sqlQuery);
+    const result = await sql.query(`${sqlQuery}`);
     return {
       data: result.recordset,
     };
   } catch (err) {
-    console.log(err.message, "ERROR ! Can not execute the query ");
+    console.log(err, "ERROR ! Can not execute the query ");
   }
 };
 
