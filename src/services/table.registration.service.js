@@ -61,7 +61,7 @@ let createTableMst = async (resBody) => {
     // }
 
     // DROP窶｢ﾂｶ
-    if (chkExistTable === 1) {
+    if (chkExistTable == 1) {
       strDRPTBL += sqlConstant.CNS_DRPTBL + strTBL + sqlConstant.CNS_KK2;
     } else {
       strDRPTBL += sqlConstant.CNS_DRPTBL2 + strTBL + sqlConstant.CNS_KK2;
