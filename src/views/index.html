@@ -758,7 +758,7 @@
         let value = data[key];
         if (index === 1)
           nameHeader.push(key)
-        if (key === 'tableColInfo') {
+        if (key === 'tableColInfos') {
           // tableColInfo ko render ra table
           continue
         } else if (key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
@@ -775,7 +775,7 @@
     })
     // create table thead
     nameHeader.forEach((header, index) => {
-      if ( header != 'tableColInfo' )
+      if ( header != 'tableColInfos' )
         stringHeader += `
           <th>${header}</th>
         `
