@@ -69,7 +69,7 @@ let createTableMst = async (resBody) => {
     // CREATE窶｢ﾂｶ
     // strCreateTable = sqlConstant.CNS_CRE + strTBL + sqlConstant.CNS_KK2;
     await resBody.tableColInfos.forEach((element) => {
-      var strCreteColumn =
+      let strCreteColumn =
         sqlConstant.CNS_KK1 +
         element.columnDefineName +
         sqlConstant.CNS_KK2 +
@@ -79,8 +79,7 @@ let createTableMst = async (resBody) => {
         sqlConstant.CNS_KK2;
 
       if (element.size !== null) {
-        strCreteColumn =
-          strCreteColumn +
+        strCreteColumn +=
           sqlConstant.CNS_SPC +
           sqlConstant.CNS_KK3 +
           element.size +
@@ -88,19 +87,19 @@ let createTableMst = async (resBody) => {
       }
 
       if (element.allowNulls === null) {
-        strCreteColumn = strCreteColumn + sqlConstant.CNS_SPC + "NULL";
+        strCreteColumn += sqlConstant.CNS_SPC + "NULL";
       } else {
-        strCreteColumn = strCreteColumn + sqlConstant.CNS_SPC + "NOT NULL";
+        strCreteColumn += sqlConstant.CNS_SPC + "NOT NULL";
       }
 
       if (element.defaultValue !== null) {
-        strCreteColumn =
-          strCreteColumn +
-          sqlConstant.CNS_SPC +
-          "DEFAULT" +
-          sqlConstant.CNS_KK3 +
-          element.defaultValue +
-          sqlConstant.CNS_KK4;
+        strCreteColumn += sqlConstant.CNS_SPC + "DEFAULT" + sqlConstant.CNS_KK3;
+        if (element.defaultValue === "") {
+          strCreteColumn += "''";
+        } else {
+          strCreteColumn += element.defaultValue;
+        }
+        strCreteColumn += sqlConstant.CNS_KK4;
       }
 
       if (element.identity !== null) {
