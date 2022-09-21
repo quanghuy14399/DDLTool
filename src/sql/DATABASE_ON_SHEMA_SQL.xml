@@ -19,7 +19,7 @@
             <foreach item="value" collection="arrTableColInfos" separator=",">
                 ${value}
             </foreach>
-            , CONSTRAINT [PK_DAT_MITSUMORI_HEAD] PRIMARY KEY CLUSTERED 
+            , CONSTRAINT [PK_${strTBL}] PRIMARY KEY CLUSTERED 
             (   
 
                 <foreach item="item" index="index" collection="arrP" separator=",">
