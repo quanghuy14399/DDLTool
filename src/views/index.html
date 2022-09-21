@@ -602,7 +602,6 @@
     remarks: '',
   }
   const SHEET_LIST_NAME_TABLE = 'テーブル一覧'
-  const list_Name_Table = []
   const allFieldsTB = []
   // const listTableTemp = []
   let dataBaseSelected = {}
@@ -984,10 +983,26 @@
   }
 
   // btn-save-table
+  let controlRender = 0
   const btnSaveTable = document.querySelector('#btn-save-table')
   btnSaveTable.addEventListener('click', () => {
+    controlRender++
     console.count('btn-save-table clicked');
-    generator()
+    if (controlRender === 1)
+      generator()
+    axios
+      .post("/table-registration", {...allFieldsTB[0]})
+      .then((response) => {
+        console.log(response.data, 'done processing')
+        alert('Insert Table Successful')
+        controlRender = 0
+        allFieldsTB.length = 0
+        dataBaseSelected = {}
+        cellEdit = {}
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   })
   // generator
   const generator = async () => {
@@ -1171,9 +1186,7 @@
       cmnItemFlg.forEach((ele, index, arr) => {
         if (ele.checked) fieldTable.cmnItemFlg = ele.value
         if (index === arr.length -1) {
-          console.log('giá trị cuối');
           if (fieldTable.cmnItemFlg === "1") {
-            console.log('thêm 1 lần và duy nhất');
             fieldTable.tableColInfos.push(...commonItem)
           }
         }
@@ -1230,16 +1243,6 @@
     })
     console.log(allFieldsTB,'after all');
 
-    axios
-      .post("/table-registration", {...allFieldsTB[0]})
-      .then((response) => {
-        console.log(response.data, 'done processing')
-        alert('Insert Table Successful')
-        
-      })
-      .catch((error) => {
-        console.log(error);
-      });
     // let fieldScript = allFieldsTB[0].fieldTemp.map((item) => (
     //                     `[${item.columnName}] [${item.dataType}]${item.size ? `(${item.size})` : ''} ${item.allowNulls ? 'NOT NULL' : 'NULL'} ${item.defaultValue ? item.defaultValue === '空' ? `DEFAULT ('')` : `DEFAULT (${item.defaultValue})` : ''}
     //                     `
