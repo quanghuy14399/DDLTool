@@ -9,7 +9,7 @@ module.exports = {
         await tableRegistrationService.executeTableRegistrationService(req);
 
       res.status(result.httpStatuscode);
-      res.json(result.data);
+      res.json(result);
     } catch (error) {
       console.log("Table List Controller ERROR!!!:", error.message);
       res.status(error.status);

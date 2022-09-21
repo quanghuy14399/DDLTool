@@ -37,34 +37,52 @@ const excuteScript = async (sqlQuery) => {
     console.log("Query executing...");
     const result = await sql.query(sqlQuery);
     return {
+      httpStatuscode: 200,
+      message: "SUCCESS",
       data: result.recordset,
+      errorMessage: null,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not execute the query ");
+    return {
+      httpStatuscode: 400,
+      message: "FAILED",
+      data: result.recordset,
+      errorMessage: err.message,
+    };
   }
 };
 
 const createOrUpdateTable = async (sqlQuery, schemaName) => {
   // console.log("AAAAAAAAAAA", configDefault.database);
-  // var config = {
-  //   user: process.env.USER || "sa",
-  //   password: process.env.PASSWORD || "123456",
-  //   database: schemaName,
-  //   driver: process.env.DRIVER || "msnodesqlv8",
-  //   server: process.env.SERVER || "localhost",
-  //   options: {
-  //     trustServerCertificate: true, // change to true for local dev / self-signed certs
-  //   },
-  // };
+  var config = {
+    user: process.env.USER || "sa",
+    password: process.env.PASSWORD || "123456",
+    database: schemaName,
+    driver: process.env.DRIVER || "msnodesqlv8",
+    server: process.env.SERVER || "localhost",
+    options: {
+      trustServerCertificate: true, // change to true for local dev / self-signed certs
+    },
+  };
   try {
-    await sql.connect(configDefault);
+    await sql.connect(config);
     console.log("Query executing...");
     const result = await sql.query(`${sqlQuery}`);
     return {
+      httpStatuscode: 200,
+      message: "SUCCESS",
       data: result.recordset,
+      errorMessage: null,
     };
   } catch (err) {
-    console.log(err, "ERROR ! Can not execute the query ");
+    console.log(err, "ERROR ! Can not create table ");
+    return {
+      httpStatuscode: 400,
+      message: "FAILED",
+      data: result.recordset,
+      errorMessage: err.message,
+    };
   }
 };
 

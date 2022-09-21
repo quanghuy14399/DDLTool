@@ -14,15 +14,17 @@ const executeTableRegistrationRepository = async (req) => {
       req,
       FORMAT
     );
-    const stringAfter = strSql.replace(/@+\s/g, '@').replace(/\[+\s/g, '[').replace(/\s+\]/g, ']').replace(/N+\s+\'/g, `N'`).replace(/\sGO(?! \s)/g, '\n')
+    const stringAfter = strSql
+      .replace(/@+\s/g, "@")
+      .replace(/\[+\s/g, "[")
+      .replace(/\s+\]/g, "]")
+      .replace(/N+\s+\'/g, `N'`)
+      .replace(/\sGO(?! \s)/g, "\n");
     console.log("Start table registration sql query: ", stringAfter);
 
-    const result = await dbConfig.createOrUpdateTable(stringAfter, req.strDB)
+    const result = await dbConfig.createOrUpdateTable(stringAfter, req.strDB);
 
-    return {
-      httpStatuscode: 200,
-      data: result.data,
-    };
+    return result;
   } catch (error) {
     console.error("Table registration repository ERROR!", error.message);
     return {
