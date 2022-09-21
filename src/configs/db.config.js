@@ -45,7 +45,7 @@ const excuteScript = async (sqlQuery) => {
 };
 
 const createOrUpdateTable = async (sqlQuery, schemaName) => {
-  console.log("AAAAAAAAAAA", configDefault.database);
+  // console.log("AAAAAAAAAAA", configDefault.database);
   // var config = {
   //   user: process.env.USER || "sa",
   //   password: process.env.PASSWORD || "123456",

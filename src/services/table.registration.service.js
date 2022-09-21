@@ -88,9 +88,9 @@ let createTableMst = async (resBody) => {
       }
 
       if (element.allowNulls === null) {
-        strCreteColumn = strCreteColumn + sqlConstant.CNS_SPC + "NOT NULL";
-      } else {
         strCreteColumn = strCreteColumn + sqlConstant.CNS_SPC + "NULL";
+      } else {
+        strCreteColumn = strCreteColumn + sqlConstant.CNS_SPC + "NOT NULL";
       }
 
       if (element.defaultValue !== null) {

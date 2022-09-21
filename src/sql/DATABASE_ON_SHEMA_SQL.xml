@@ -3,7 +3,9 @@
 <mapper namespace="dbshema">
    
     <insert id='createTable'> 
-       
+
+        USE [${strDB}]
+        GO   
         /****** ${strTBLNM} ******/   
         /****** Object:  Table [dbo].[${strTBL}]    Script Date: ${excuteDate} ******/
         SET ANSI_NULLS ON
@@ -27,10 +29,10 @@
             )
 
             <if test="optSeqKeyFlg == 1">
-                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = ON) ON [PRIMARY]
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
             </if>
             <if test="optSeqKeyFlg != 1">
-                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+                WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = ON) ON [PRIMARY]
             </if>
         
         ) ON [PRIMARY]
@@ -43,8 +45,8 @@
         </foreach>
 
         <if test="strDRPIDX01 != null and strDRPIDX01 != ''">
-         /****** Object:  Index [IDX01_#{strTBL}]    Script Date: #{excuteDate} ******/
-            #{strDRPIDX01}
+         /****** Object:  Index [IDX01_${strTBL}]    Script Date: ${excuteDate} ******/
+            ${strDRPIDX01}
             GO
             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
             (
@@ -65,7 +67,7 @@
          /****** Object:  Index [IDX02_${strTBL}]    Script Date: ${excuteDate} ******/
             ${strDRPIDX02}
             GO
-             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[#{strTBL]
+             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
             (
              <foreach item="item" index="index" collection="${arrS2}" separator=",">
 	            [${item}] ASC
@@ -101,12 +103,12 @@
 
         <if test="strDRPIDX04 != null and strDRPIDX04 != ''">
          /****** Object:  Index [IDX04_${strTBL}]    Script Date: ${excuteDate} ******/
-            #{strDRPIDX04}
+            ${strDRPIDX04}
             GO
              CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
             (
              <foreach item="item" index="index" collection="arrS4" separator=",">
-	            [#{item}] ASC
+	            [${item}] ASC
              </foreach>
              )
              <if test="optSeqKeyFlg == 1">
