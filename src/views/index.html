@@ -79,6 +79,10 @@
 
   .uploaded {
     display: none;
+    text-align: center;
+    border: 1px dashed #8ea8bf;
+    border-radius: 20px;
+    padding: 20px 10px;
   }
 
   #customers {
@@ -218,6 +222,19 @@
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
+  }
+
+  input:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  input[type="text"] {
+    all: unset;
+  }
+
+  input {
+    border: 1px solid black;
   }
 
   input:checked+.slider {
@@ -387,6 +404,7 @@
   .details-modal .details-modal-content .field-edit {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
   }
   .details-modal .details-modal-content .field-edit label {
     display: block;
@@ -470,9 +488,18 @@
     }
   }
 
-  .closeFileUpload {
+  .close-file-upload {
     text-align: right;
     margin-right: 10px;
+  }
+
+  .isvalid {
+    display: none;
+    color: red;
+  }
+  .not-isvalid {
+    display: block;
+    color: red;
   }
  
 </style>
@@ -575,8 +602,8 @@
             </label>
           </div>
 
-          <div class="border-upload uploaded">
-            <div class="closeFileUpload">
+          <div class="uploaded">
+            <div class="close-file-upload">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M13.7071 1.70711C14.0976 1.31658 14.0976 0.683417 13.7071 0.292893C13.3166 -0.0976311 12.6834 -0.0976311 12.2929 0.292893L7 5.58579L1.70711 0.292893C1.31658 -0.0976311 0.683417 -0.0976311 0.292893 0.292893C-0.0976311 0.683417 -0.0976311 1.31658 0.292893 1.70711L5.58579 7L0.292893 12.2929C-0.0976311 12.6834 -0.0976311 13.3166 0.292893 13.7071C0.683417 14.0976 1.31658 14.0976 1.70711 13.7071L7 8.41421L12.2929 13.7071C12.6834 14.0976 13.3166 14.0976 13.7071 13.7071C14.0976 13.3166 14.0976 12.6834 13.7071 12.2929L8.41421 7L13.7071 1.70711Z" fill="black" />
               </svg>
@@ -626,11 +653,7 @@
           </div>
         </div>
         <div class="details-modal-content">
-          <p>
-            You can click the X in the corner or click the overlay to close this modal.
-            Something like this could be useful as a nice way to show additional information,
-            but that's about as far as I would take it. It's just a nice way of styling the details element.
-          </p>
+          <p class="isvalid"></p>
         </div>
       </div>
     </section>
@@ -706,17 +729,22 @@
   }
 
   // addEventListener 
-  console.log(closePopupElement)
   closePopupElement.addEventListener('click', () => {
     popupElement.style.display = 'none'
   });
 
-  const closeFile = document.querySelector('.closeFileUpload')
-  console.log(closeFile)
+  const closeFile = document.querySelector('.close-file-upload')
   closeFile.addEventListener('click', () => {
-    console.log('vao ko')
-    // const inputFileUploaded = document.querySelector('.uploaded')
-    // inputFileUploaded.style.display = 'none'
+    const inputFileUploaded = document.querySelector('.uploaded')
+    inputFileUploaded.style.display = 'none'
+    const inputFileUI = document.querySelector('.border-upload')
+    inputFileUI.style.display = 'block'
+    const input = document.getElementById('input')
+    input.value = ''
+    const btnSaveTable = document.querySelector('#btn-save-table')
+    btnSaveTable.classList.add('disabled')
+    tbCellCommon.length = 0
+    allFieldsTB.length = 0
   });
 
   // check enabled edit detail table
@@ -776,12 +804,12 @@
         for (const key in dataRender) {
           if (Object.hasOwnProperty.call(dataRender, key)) {
             // create input type checkbox
-            if(key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
+            if(key === 'primaryKey' || key === 'allowNulls') {
               templatedData += `
                 <div class="field-edit">
                   <label for="${key}">${key}</label>
                   <div class="input-checkbox">
-                  <input type="checkbox" id="${key}" name="${key}" ${dataRender[key] === '1' ? 'checked' : ''} value="${dataRender[key]}">
+                  <input oninput="elementChangeInput(this.name, this.value)" type="checkbox" id="${key}" name="${key}" ${dataRender[key] === '1' ? 'checked' : ''} value="${dataRender[key]}">
                   </div>
                 </div>
                 <div class="space"></div>
@@ -791,18 +819,18 @@
             templatedData += `
               <div class="field-edit">
                 <label for="${key}">${key}</label>
-                <input type=${typeof dataRender[key]} id="${key}" name="${key}" value="${dataRender[key]}">
+                <input oninput="elementChangeInput(this.name, this.value)" type=${typeof dataRender[key]} id="${key}" name="${key}" value="${dataRender[key]}">
               </div>
               <div class="space"></div>
             `
           }
         }
-        positionRenderData.innerHTML = templatedData + `<div class="button" id="save-data-change">Save</div>`
+        positionRenderData.innerHTML = templatedData + '<p class="isvalid"></p>' + `<div class="button" id="save-data-change">Save</div>`
 
         // addEventListener change on checkbox input
         for (const key in dataRender) {
           if (Object.hasOwnProperty.call(dataRender, key)) {
-            if(key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
+            if(key === 'primaryKey' || key === 'allowNulls') {
               const checkbox = document.querySelector('#' + key);
               checkbox.addEventListener('change',  () => {
                 checkbox.value = checkbox.checked ? 1 : 0;
@@ -1353,6 +1381,88 @@
     })
     console.log(allFieldsTB,'after all');
   }
+
+  // check validation
+  
+  const elementChangeInput = (nameField, valueField) => {
+    const blockEditor = document.querySelector(`.details-modal-content`)
+
+    const fieldType = ["columnName", "size", "primaryKey"]
+    const symbol = {
+      char : ["C", "char"],
+      varchar : ["VC", "VarChar", "varchar"],
+      nchar : ["NC", "nchar", "NChar"],
+      nvarchar : ["NVC", "nvarchar", "nvarchar2"],
+      numeric : ["N", "number", "numeric"],
+      decimal : ["DC", "decimal"],
+      date : ["D", "DATE", "date"],
+      time : ["T", "TIME", "time"],
+      datetime : ["DT", "DATETIME", "datetime"],
+      datetime2 : ["DT2", "DATETIME2", "datetime2"],
+      int : ["Int", "INT"],
+      bigint : ["Bigint", "BIGINT"],
+      smallint : ["Smallint", "SmallInt", "SMALLINT"],
+      tinyint : ["Tinyint", "TinyInt", "TINYINT"],
+    }
+
+    const regExNumber = /^\s|([0-9]+)$/
+    if (nameField === ("size" || "primaryKey")) {
+      if (!valueField) {
+        valueField = ' '
+      }
+      if (regExNumber.test(valueField)) {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "green"
+        toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+        
+      } else {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "red"
+        toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be a number`)
+      }
+    }
+
+    const regExIdentity = /^\s|([0-9]+\,+[0-9]{0,10})$/
+    if (nameField === "identity") {
+      if (!valueField) {
+        valueField = ' '
+      }
+      if (regExIdentity.test(valueField)) {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "green"
+        toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+        
+      } else {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "red"
+        toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be have two number (1,1)`)
+      }
+    }
+
+    const regExColumnName = /^[A-Z0-9]{1,100}$|([A-Z0-9]+\_+[A-Z0-9]{1,100})$/
+    if (nameField === "columnName") {
+      if (regExColumnName.test(valueField)) {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "green"
+        toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+        
+      } else {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "red"
+        toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be uppercase character (TDB_GYOSHU_CD)`)
+      }
+    }
+  }
+  
+
+  const toggleStatus = (parent, classRemove, classAdd, content) => {
+    const isvalid = parent.querySelector(`.${classRemove}`)
+    if (!!!isvalid) return
+    isvalid.classList.remove(`${classRemove}`)
+    isvalid.classList.add(`${classAdd}`)
+    isvalid.innerHTML = `${content}`
+  }
+
 </script>
 
 </html>
