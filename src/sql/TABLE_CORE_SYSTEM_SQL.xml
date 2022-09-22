@@ -9,7 +9,35 @@
         ORDER BY RIREKI_SEQ DESC
     </select>
 
-    <insert id='addOrEditTableInfos'> 
-      
+    <insert id='addTableInfo'> 
+        INSERT INTO RRK_MST_DDL_CONF_TABLE (
+            RIREKI_CRE_DATETIME
+            ,DATABASE_NM
+            ,TABLE_NM
+            ,DESCRIPTION
+            ,TABLE_INFO
+            ,CRE_USER_ID
+            ,CRE_DATETIME
+            ,UPD_USER_ID
+            ,UPD_DATETIME
+            ,VERSION
+        ) VALUES (
+            CURRENT_TIMESTAMP
+            ,N#{databaseName}
+            ,N#{tableName}
+            ,N#{description}
+            ,N#{tableInfo}
+            ,'admin'
+            ,CURRENT_TIMESTAMP
+            ,'admin'
+            ,CURRENT_TIMESTAMP
+            ,(
+                SELECT
+                    ISNULL( MAX(VERSION), 0) + 1
+                FROM RRK_MST_DDL_CONF_TABLE
+                WHERE DATABASE_NM = #{databaseName} 
+                 AND TABLE_NM = #{tableName}
+            )
+        )
     </insert>
 </mapper>

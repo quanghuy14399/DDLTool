@@ -8,10 +8,10 @@ const getTableListService = async (req) => {
     result.data.forEach(function (element) {
       data.push({
         riekiCreDatetime: element.RIREKI_CRE_DATETIME,
-        schemaName: element.SCHEMA_NM,
+        databaseName: element.DATABASE_NM,
         tableName: element.TABLE_NM,
         description: element.DESCRIPTION,
-        tableColInfos: JSON.parse(element.TABLE_COL_INF),
+        tableInfo: JSON.parse(element.TABLE_INFO),
         createUserId: element.CRE_USER_ID,
         createDateTime: element.CRE_DATETIME,
         updateUserId: element.UPD_USER_ID,

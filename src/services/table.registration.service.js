@@ -1,4 +1,5 @@
-const tableListReposistory = require("src/reposistories/table.registration.repository.js");
+const tableListReposistory = require("src/reposistories/table.list.repository.js");
+const tableRegistrationReposistory = require("src/reposistories/table.registration.repository.js");
 const sqlConstant = require("src/constants/sql.constant.js");
 const msgConstant = require("src/constants/messages.constant.js");
 
@@ -32,7 +33,7 @@ let createTableMst = async (resBody) => {
     //   return await msgConstant.getError93(strTBL, strDB);
     // }
     RtnCd = 0;
-    strDB += resBody.schemaName;
+    strDB += resBody.databaseName;
     if (strDB == "") {
       strDB = "SagawaCoreSystem";
     } else {
@@ -169,9 +170,19 @@ const executeTableRegistrationService = async (req) => {
   console.log(" Start table registration service... ");
   try {
     const tableColInfo = await createTableMst(req.body);
-    return await tableListReposistory.executeTableRegistrationRepository(
-      tableColInfo
-    );
+    const result =
+      await tableRegistrationReposistory.executeTableRegistrationRepository(
+        tableColInfo
+      );
+    if (result === 200) {
+      const insertParams = {
+        databaseName: req.body.databaseName,
+        tableName: req.body.tableDefinitionName,
+        description: req.body.remarks,
+        tableInfo: req.body,
+      };
+      return await tableListReposistory.insertTableListRepository(insertParams);
+    }
   } catch (error) {
     console.log(" Table registration service ERROR!!!", error.message);
   }

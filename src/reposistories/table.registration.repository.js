@@ -24,14 +24,14 @@ const executeTableRegistrationRepository = async (req) => {
 
     const result = await dbConfig.createOrUpdateTable(stringAfter, req.strDB);
 
-    return result;
+    return result.httpStatuscode;
   } catch (error) {
     console.error("Table registration repository ERROR!", error.message);
     return {
-      httpStatuscode: 502,
+      httpStatuscode: 400,
       data: {
-        errorCode: "SERVER-ERROR",
-        errorMessage: "ERROR!!! check sql query ",
+        errorCode: "SQL-ERROR",
+        errorMessage: error.message,
       },
     };
   }

@@ -38,18 +38,10 @@ const excuteScript = async (sqlQuery) => {
     const result = await sql.query(sqlQuery);
     return {
       httpStatuscode: 200,
-      message: "SUCCESS",
       data: result.recordset,
-      errorMessage: null,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not execute the query ");
-    return {
-      httpStatuscode: 400,
-      message: "FAILED",
-      data: result.recordset,
-      errorMessage: err.message,
-    };
   }
 };
 
@@ -71,18 +63,10 @@ const createOrUpdateTable = async (sqlQuery, schemaName) => {
     const result = await sql.query(`${sqlQuery}`);
     return {
       httpStatuscode: 200,
-      message: "SUCCESS",
       data: result.recordset,
-      errorMessage: null,
     };
   } catch (err) {
     console.log(err, "ERROR ! Can not create table ");
-    return {
-      httpStatuscode: 400,
-      message: "FAILED",
-      data: result.recordset,
-      errorMessage: err.message,
-    };
   }
 };
 
