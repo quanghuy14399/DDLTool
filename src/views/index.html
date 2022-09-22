@@ -231,6 +231,7 @@
 
   input[type="text"] {
     all: unset;
+    border: 1px solid black;
   }
 
   input {
@@ -545,8 +546,8 @@
           <div class="table">
             <div class="detail-information align-center mb-5">
               <p class="mb-0">
-                <strong>Table:</strong> Account
-                <span><strong>Version:</strong> 1.0</span>
+                <strong>Table:</strong> <span id="table-name">Table Name </span>
+                <strong>Version:</strong> <span id="table-version">1.0</span> 
               </p>
               <div class="button-table d-flex">
                 <div class="button w-16 disabled" id="btn-re-execute" disabled><span>Execute</span></div>
@@ -622,7 +623,7 @@
         <div class="save-table">
           <div class="block-input">
             <!-- <v-text-field label="SCHEMA名" hide-details="auto" class="mb-6"></v-text-field> -->
-            <label for="database-name"><span class="title-small">SCHEMA名</span><input type="text" id="database-name"></label>
+            <label for="database-name"><span class="title-small">DATABASE 名</span><input type="text" id="database-name"></label>
             <div class="row">
               <div class="col-md-6">
                 <h2>共通項目</h2>
@@ -781,6 +782,7 @@
             const positionTableTbody = document.querySelector('#customers.one tbody')
             const positionTableThead = document.querySelector('#customers.one thead')
             // render detail table
+            renderTableDetailName(response.data[index])
             renderTable(response.data[index].tableColInfos, positionTableTbody, positionTableThead)
             catchElementClicked(response.data[index].tableColInfos)
           })
@@ -880,6 +882,7 @@
   });
   
   const renderTable = (datas, tbody, thead) => {
+    console.log(datas)
     let nameHeader = []
     let stringHeader = ``
     tbody.innerHTML = ``
@@ -920,6 +923,11 @@
     `
   }
 
+  const renderTableDetailName = (tableDetail) => {
+    document.querySelector('#table-name').innerHTML = tableDetail.tableName
+    document.querySelector('#table-version').innerHTML = tableDetail.version
+  }
+  
   const searchNameTable = async (sheetNames) => {
     const data = []
     const listTemp = []
@@ -1426,7 +1434,7 @@
       } else {
         const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
         elementEditorSelected.style.borderColor = "red"
-        toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be a vale in list`)
+        toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} is not validated`)
       }
     })
   
