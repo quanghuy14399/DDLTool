@@ -1413,30 +1413,21 @@
     const blockEditor = document.querySelector(`.details-modal-content`)
 
     const fieldType = ["columnName", "size", "primaryKey"]
-    const inputSelection = document.querySelectorAll('input[list]');
-    console.log(inputSelection, 'input select');
-    const datalistSelection = document.querySelectorAll(`#${nameField}s option`);
-    console.log(datalistSelection, 'check m nè');
+    const inputSelection = document.querySelector('input[list]');
+    const datalistSelection = Array.prototype.slice.call(document.querySelectorAll(`#${nameField}s option`));
 
-    inputSelection.forEach((list) => {
-      list.addEventListener('change', () => {
-        let optionFound = false
-        console.log(list.value, 'list vlaue');
-        datalistSelection.forEach((item) => {
-          console.log(item.value, 'item value');
-          if (list.value === item.value) {
-            const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
-            elementEditorSelected.style.borderColor = "green"
-            toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
-            return
-          } else {
-            console.log(list.value, '-', item.value);
-            const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
-            elementEditorSelected.style.borderColor = "red"
-            toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be a vale in list`)
-          }
-        })
-      })
+    inputSelection.addEventListener('keyup', () => {
+      let optionFound = false
+      const haveInDataList = datalistSelection.find((item) => (item.value == inputSelection.value))
+      if (haveInDataList) {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "green"
+        toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+      } else {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "red"
+        toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be a vale in list`)
+      }
     })
   
     const regExNumber = /^\s|([0-9]+)$/
