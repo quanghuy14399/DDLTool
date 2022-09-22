@@ -622,7 +622,7 @@
         <div class="save-table">
           <div class="block-input">
             <!-- <v-text-field label="SCHEMA名" hide-details="auto" class="mb-6"></v-text-field> -->
-            <label for="SCHEMA"><span class="title-small">SCHEMA名</span><input type="text" id="SCHEMA"></label>
+            <label for="database-name"><span class="title-small">SCHEMA名</span><input type="text" id="database-name"></label>
             <div class="row">
               <div class="col-md-6">
                 <h2>共通項目</h2>
@@ -820,22 +820,22 @@
                 <div class="field-edit">
                   <label for="${key}">${key}</label>
                   <input oninput="elementChangeInput(this.name, this.value)" list="${key}s" id="${key}" name="${key}" value="${dataRender[key]}">
-                    <datalist id="${key}s">
-                      <option value="char">
-                      <option value="varchar">
-                      <option value="nchar">
-                      <option value="nvarchar">
-                      <option value="numeric">
-                      <option value="decimal">
-                      <option value="date">
-                      <option value="time">
-                      <option value="datetime">
-                      <option value="datetime2">
-                      <option value="int">
-                      <option value="bigint">
-                      <option value="smallint">
-                      <option value="tinyint">
-                    </datalist>
+                  <datalist id="${key}s">
+                    <option value="char">
+                    <option value="varchar">
+                    <option value="nchar">
+                    <option value="nvarchar">
+                    <option value="numeric">
+                    <option value="decimal">
+                    <option value="date">
+                    <option value="time">
+                    <option value="datetime">
+                    <option value="datetime2">
+                    <option value="int">
+                    <option value="bigint">
+                    <option value="smallint">
+                    <option value="tinyint">
+                  </datalist>
                   </div>
                 </div>
                 <div class="space"></div>
@@ -1215,7 +1215,7 @@
 
   // generator
   const generator = async () => {
-    const SCHEMA = document.querySelector('#SCHEMA')
+    const databaseName = document.querySelector('#database-name')
     const cmnItemFlg = document.querySelectorAll('input[name="cmnItemFlg"]')
     const checkExistTable = document.querySelectorAll('input[name="checkExistTable"]')
     const toDay = new Date()
@@ -1390,7 +1390,7 @@
     if (!allFieldsTB) return
     await allFieldsTB.forEach((fieldTable, index, arr) => {
       fieldTable.excuteDate = toDay.toLocaleString()
-      fieldTable.schemaName = SCHEMA.value ? SCHEMA.value : 'SagawaTableCoreSystem'
+      fieldTable.dataBaseName = databaseName.value ? databaseName.value : 'SagawaTableCoreSystem'
       cmnItemFlg.forEach((ele, index, arr) => {
         if (ele.checked) fieldTable.cmnItemFlg = ele.value
         if (index === arr.length -1) {
@@ -1413,7 +1413,32 @@
     const blockEditor = document.querySelector(`.details-modal-content`)
 
     const fieldType = ["columnName", "size", "primaryKey"]
+    const inputSelection = document.querySelectorAll('input[list]');
+    console.log(inputSelection, 'input select');
+    const datalistSelection = document.querySelectorAll(`#${nameField}s option`);
+    console.log(datalistSelection, 'check m nè');
 
+    inputSelection.forEach((list) => {
+      list.addEventListener('change', () => {
+        let optionFound = false
+        console.log(list.value, 'list vlaue');
+        datalistSelection.forEach((item) => {
+          console.log(item.value, 'item value');
+          if (list.value === item.value) {
+            const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+            elementEditorSelected.style.borderColor = "green"
+            toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+            return
+          } else {
+            console.log(list.value, '-', item.value);
+            const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+            elementEditorSelected.style.borderColor = "red"
+            toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be a vale in list`)
+          }
+        })
+      })
+    })
+  
     const regExNumber = /^\s|([0-9]+)$/
     if (nameField === ("size" || "primaryKey")) {
       if (!valueField) {
