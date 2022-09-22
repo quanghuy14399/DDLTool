@@ -77,6 +77,14 @@
     padding: 20px 10px;
   }
 
+  .uploaded {
+    display: none;
+    text-align: center;
+    border: 1px dashed #8ea8bf;
+    border-radius: 20px;
+    padding: 20px 10px;
+  }
+
   #customers {
     font-family: Arial, Helvetica, sans-serif;
     width: 100%;
@@ -214,6 +222,19 @@
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
+  }
+
+  input:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  input[type="text"] {
+    all: unset;
+  }
+
+  input {
+    border: 1px solid black;
   }
 
   input:checked+.slider {
@@ -383,6 +404,7 @@
   .details-modal .details-modal-content .field-edit {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
   }
   .details-modal .details-modal-content .field-edit label {
     display: block;
@@ -421,6 +443,63 @@
     pointer-events: none;
     background-color: #555;
     border: #555;
+  }
+
+  .lds-ring {
+    display: none;
+    position: relative;
+    margin: 0 auto;
+    width: 80px;
+    height: 80px;
+    background-color: white;
+  }
+
+  .lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border: 8px solid #000;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #000 transparent transparent transparent;
+  }
+
+  .lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+  }
+
+  .lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+
+  .lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+  }
+
+  @keyframes lds-ring {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .close-file-upload {
+    text-align: right;
+    margin-right: 10px;
+  }
+
+  .isvalid {
+    display: none;
+    color: red;
+  }
+  .not-isvalid {
+    display: block;
+    color: red;
   }
  
 </style>
@@ -522,6 +601,23 @@
               <P>Maximun size: 10MB</P>
             </label>
           </div>
+
+          <div class="uploaded">
+            <div class="close-file-upload">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M13.7071 1.70711C14.0976 1.31658 14.0976 0.683417 13.7071 0.292893C13.3166 -0.0976311 12.6834 -0.0976311 12.2929 0.292893L7 5.58579L1.70711 0.292893C1.31658 -0.0976311 0.683417 -0.0976311 0.292893 0.292893C-0.0976311 0.683417 -0.0976311 1.31658 0.292893 1.70711L5.58579 7L0.292893 12.2929C-0.0976311 12.6834 -0.0976311 13.3166 0.292893 13.7071C0.683417 14.0976 1.31658 14.0976 1.70711 13.7071L7 8.41421L12.2929 13.7071C12.6834 14.0976 13.3166 14.0976 13.7071 13.7071C14.0976 13.3166 14.0976 12.6834 13.7071 12.2929L8.41421 7L13.7071 1.70711Z" fill="black" />
+              </svg>
+            </div>
+            <div class="space"></div>
+            <div class="img-upload">
+              <img src="/images/upload-icon.png" alt="Upload" />
+            </div>
+            <div class="space"></div>
+            <p id="fileName"></p>
+            <p id="fileSize"></p>
+          </div>
+
+          <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
         </div>
         <div class="save-table">
           <div class="block-input">
@@ -541,7 +637,7 @@
             </div>
           </div>
           <div class="space"></div>
-          <div class="button mx-auto w-200" id="btn-save-table">SAVE TABLE</div>
+          <div class="button mx-auto w-200 disabled" id="btn-save-table">SAVE TABLE</div>
         </div>
       </section>
     </div>
@@ -557,11 +653,7 @@
           </div>
         </div>
         <div class="details-modal-content">
-          <p>
-            You can click the X in the corner or click the overlay to close this modal.
-            Something like this could be useful as a nice way to show additional information,
-            but that's about as far as I would take it. It's just a nice way of styling the details element.
-          </p>
+          <p class="isvalid"></p>
         </div>
       </div>
     </section>
@@ -623,20 +715,36 @@
         [`${idValue}`] : value
       }
     })
-    dataBaseSelected.tableColInfo[indexSelected] = {
+    dataBaseSelected.tableColInfos[indexSelected] = {
       ...cellEdit
     }
     const positionTableTbody = document.querySelector('#customers.one tbody')
     const positionTableThead = document.querySelector('#customers.one thead')
     // render detail table
-    renderTable(dataBaseSelected.tableColInfo, positionTableTbody, positionTableThead)
-    catchElementClicked(dataBaseSelected.tableColInfo)
+    renderTable(dataBaseSelected.tableColInfos, positionTableTbody, positionTableThead)
+    catchElementClicked(dataBaseSelected.tableColInfos)
     const enableBtnReExecute = document.querySelector('#btn-re-execute')
     enableBtnReExecute.classList.remove('disabled')
     popupElement.style.display = 'none'
   }
+
+  // addEventListener 
   closePopupElement.addEventListener('click', () => {
     popupElement.style.display = 'none'
+  });
+
+  const closeFile = document.querySelector('.close-file-upload')
+  closeFile.addEventListener('click', () => {
+    const inputFileUploaded = document.querySelector('.uploaded')
+    inputFileUploaded.style.display = 'none'
+    const inputFileUI = document.querySelector('.border-upload')
+    inputFileUI.style.display = 'block'
+    const input = document.getElementById('input')
+    input.value = ''
+    const btnSaveTable = document.querySelector('#btn-save-table')
+    btnSaveTable.classList.add('disabled')
+    tbCellCommon.length = 0
+    allFieldsTB.length = 0
   });
 
   // check enabled edit detail table
@@ -673,8 +781,8 @@
             const positionTableTbody = document.querySelector('#customers.one tbody')
             const positionTableThead = document.querySelector('#customers.one thead')
             // render detail table
-            renderTable(response.data[index].tableColInfo, positionTableTbody, positionTableThead)
-            catchElementClicked(response.data[index].tableColInfo)
+            renderTable(response.data[index].tableColInfos, positionTableTbody, positionTableThead)
+            catchElementClicked(response.data[index].tableColInfos)
           })
         })
       })
@@ -696,33 +804,58 @@
         for (const key in dataRender) {
           if (Object.hasOwnProperty.call(dataRender, key)) {
             // create input type checkbox
-            if(key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
+            if (key === 'primaryKey' || key === 'allowNulls') {
               templatedData += `
                 <div class="field-edit">
                   <label for="${key}">${key}</label>
                   <div class="input-checkbox">
-                  <input type="checkbox" id="${key}" name="${key}" ${dataRender[key] === '1' ? 'checked' : ''} value="${dataRender[key]}">
+                  <input oninput="elementChangeInput(this.name, this.value)" type="checkbox" id="${key}" name="${key}" ${dataRender[key] === '1' ? 'checked' : ''} value="${dataRender[key]}">
                   </div>
                 </div>
                 <div class="space"></div>
               `
             }
-            else 
+            else if (key === 'dataType') {
+              templatedData += `
+                <div class="field-edit">
+                  <label for="${key}">${key}</label>
+                  <input oninput="elementChangeInput(this.name, this.value)" list="${key}s" id="${key}" name="${key}" value="${dataRender[key]}">
+                    <datalist id="${key}s">
+                      <option value="char">
+                      <option value="varchar">
+                      <option value="nchar">
+                      <option value="nvarchar">
+                      <option value="numeric">
+                      <option value="decimal">
+                      <option value="date">
+                      <option value="time">
+                      <option value="datetime">
+                      <option value="datetime2">
+                      <option value="int">
+                      <option value="bigint">
+                      <option value="smallint">
+                      <option value="tinyint">
+                    </datalist>
+                  </div>
+                </div>
+                <div class="space"></div>
+              `
+            } else
             templatedData += `
               <div class="field-edit">
                 <label for="${key}">${key}</label>
-                <input type=${typeof dataRender[key]} id="${key}" name="${key}" value="${dataRender[key]}">
+                <input oninput="elementChangeInput(this.name, this.value)" type=${typeof dataRender[key]} id="${key}" name="${key}" value="${dataRender[key]}">
               </div>
               <div class="space"></div>
             `
           }
         }
-        positionRenderData.innerHTML = templatedData + `<div class="button" id="save-data-change">Save</div>`
+        positionRenderData.innerHTML = templatedData + '<p class="isvalid"></p>' + `<div class="button" id="save-data-change">Save</div>`
 
         // addEventListener change on checkbox input
         for (const key in dataRender) {
           if (Object.hasOwnProperty.call(dataRender, key)) {
-            if(key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
+            if(key === 'primaryKey' || key === 'allowNulls') {
               const checkbox = document.querySelector('#' + key);
               checkbox.addEventListener('change',  () => {
                 checkbox.value = checkbox.checked ? 1 : 0;
@@ -827,6 +960,14 @@
   // listTableTemp
   
   const readFile = async () => {
+    const inputFileUI = document.querySelector('.border-upload')
+    inputFileUI.style.display = 'none'
+
+    const loading = document.querySelector('.lds-ring')
+    loading.style.display = 'block'
+
+    const inputFileUploaded = document.querySelector('.uploaded')
+
     const input = document.getElementById('input')
     const tbField = {}
     
@@ -839,8 +980,13 @@
     });
 
     const listTableTemp = await searchNameTable(sheetNames)
+
     setTimeout(async function() {
-      if (!listTableTemp.length) return alert('Sheet is not available')
+      if (!listTableTemp.length) {
+        loading.style.display = 'none'
+        inputFileUI.style.display = 'block'
+        return alert('Sheet is not available')
+      }
       console.log(listTableTemp); // will show devices array
       const lastItem = listTableTemp.length - 1
       let error = false
@@ -883,6 +1029,9 @@
           allFieldsTB.push({ ...tbCellCommon, tableColInfos , fieldKey })
           if(index === lastItem) {
             allFieldsData(allFieldsTB)
+            inputFileUploaded.style.display = 'block'
+            document.getElementById('fileName').innerText = input.files[0].name
+            document.getElementById('fileSize').innerText = (input.files[0].size / 1048576).toFixed(2) + 'MB'
           }
         })
         .catch((e) => {
@@ -890,7 +1039,9 @@
           error = true
         })
         .finally(() => {
-          
+          loading.style.display = 'none'
+          const btnSaveTable = document.querySelector('#btn-save-table')
+          btnSaveTable.classList.remove('disabled')
         })
         
       })
@@ -988,22 +1139,80 @@
   btnSaveTable.addEventListener('click', () => {
     controlRender++
     console.count('btn-save-table clicked');
-    if (controlRender === 1)
+    if (controlRender === 1) {
+      changeHistoryTable()
       generator()
+    }
+      
     axios
       .post("/table-registration", {...allFieldsTB[0]})
       .then((response) => {
         console.log(response.data, 'done processing')
         alert('Insert Table Successful')
-        controlRender = 0
-        allFieldsTB.length = 0
-        dataBaseSelected = {}
-        cellEdit = {}
+        location.reload();
       })
       .catch((error) => {
         console.log(error);
       });
   })
+  
+  // change value selected
+  const changeValueSelect = async (property, value) => {
+    await allFieldsTB.forEach((fieldTable) => {
+      fieldTable.property = value
+    })
+  }
+
+  // change history table
+  const changeHistoryTable = async () => {
+    await allFieldsTB.forEach((fieldTable, index, arr) => {
+      if (fieldTable.withHistoryTable) {
+        const tableDuplicate = {
+          ...fieldTable
+        }
+        tableDuplicate.tableDefinitionName = 'RRK_' + fieldTable.tableDefinitionName
+        tableDuplicate.fieldKey.p = ['RIREKI_SEQ']
+        
+        const RIREKI_SEQ = {
+          columnName: "履歴SEQ",
+          columnDefineName: "RIREKI_SEQ",
+          dataType: "bigint",
+          size: null,
+          primaryKey: 1,
+          keyS1: null,
+          keyS2: null,
+          keyS3: null,
+          keyS4: null,
+          allowNulls: "×",
+          defaultValue: null,
+          identity: "1,1",
+          description: null
+        }
+        const RIREKI_CRE_DATETIME = {
+          columnName: "履歴作成日時",
+          columnDefineName: "RIREKI_CRE_DATETIME",
+          dataType: "datetime2",
+          size: null,
+          primaryKey: null,
+          keyS1: null,
+          keyS2: null,
+          keyS3: null,
+          keyS4: null,
+          allowNulls: "×",
+          defaultValue: null,
+          identity: null,
+          description: null
+        }
+        tableDuplicate.tableColInfos.push(RIREKI_SEQ)
+        tableDuplicate.tableColInfos.push(RIREKI_CRE_DATETIME)
+        allFieldsTB[arr.length] = {
+          ...tableDuplicate
+        }
+          
+      }
+    })
+  }
+
   // generator
   const generator = async () => {
     const SCHEMA = document.querySelector('#SCHEMA')
@@ -1178,7 +1387,6 @@
       },
 
     ]
-    // toDay.toLocaleString()
     if (!allFieldsTB) return
     await allFieldsTB.forEach((fieldTable, index, arr) => {
       fieldTable.excuteDate = toDay.toLocaleString()
@@ -1195,113 +1403,75 @@
       checkExistTable.forEach(ele => {
         if (ele.checked) fieldTable.checkExistTable = ele.value
       })
-      // check RRK
-      if (fieldTable.withHistoryTable) {
-        const tableDuplicate = {
-          ...fieldTable
-        }
-        tableDuplicate.tableDefinitionName = 'RRK_' + fieldTable.tableDefinitionName
-        tableDuplicate.fieldKey.p = ['RIREKI_SEQ']
-        
-        const RIREKI_SEQ = {
-          columnName: "履歴SEQ",
-          columnDefineName: "RIREKI_SEQ",
-          dataType: "bigint",
-          size: null,
-          primaryKey: 1,
-          keyS1: null,
-          keyS2: null,
-          keyS3: null,
-          keyS4: null,
-          allowNulls: "×",
-          defaultValue: null,
-          identity: "1,1",
-          description: null
-        }
-        const RIREKI_CRE_DATETIME = {
-          columnName: "履歴作成日時",
-          columnDefineName: "RIREKI_CRE_DATETIME",
-          dataType: "datetime2",
-          size: null,
-          primaryKey: null,
-          keyS1: null,
-          keyS2: null,
-          keyS3: null,
-          keyS4: null,
-          allowNulls: "×",
-          defaultValue: null,
-          identity: null,
-          description: null
-        }
-        tableDuplicate.tableColInfos.push(RIREKI_SEQ)
-        tableDuplicate.tableColInfos.push(RIREKI_CRE_DATETIME)
-        allFieldsTB[arr.length] = {
-          ...tableDuplicate
-        }
-          
-      }
     })
     console.log(allFieldsTB,'after all');
-
-    // let fieldScript = allFieldsTB[0].fieldTemp.map((item) => (
-    //                     `[${item.columnName}] [${item.dataType}]${item.size ? `(${item.size})` : ''} ${item.allowNulls ? 'NOT NULL' : 'NULL'} ${item.defaultValue ? item.defaultValue === '空' ? `DEFAULT ('')` : `DEFAULT (${item.defaultValue})` : ''}
-    //                     `
-    //                   ))
-    // let keyPScript = allFieldsTB[0].fieldKey[0].map((field, index, arr) => (
-    //                     field ? `[${field}] ASC
-    //                     ` : ''
-    //                   ))
-    // let execScript = allFieldsTB[0].fieldTemp.map((item) => (
-    //                     `EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'${item.columnDefineName}' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'${item.tableDefinitionName}', @level2type=N'COLUMN',@level2name=N'${item.columnName}'
-    //                     GO
-    //                     `
-    //                   ))
-    // let keySScript = allFieldsTB[0].fieldKey.map((item, index) => {
-    //                     if (index === 0) return
-    //                     return item ? `
-    //                     /****** Object:  Index [IDX0${index}_${allFieldsTB[0].tableDefinitionName}]    Script Date: ${toDay.toLocaleString()} ******/
-    //                     DROP INDEX IF EXISTS [IDX0${index}_${allFieldsTB[0].tableDefinitionName}] ON [dbo].[${allFieldsTB[0].tableDefinitionName}]
-    //                     GO
-
-    //                     CREATE NONCLUSTERED INDEX [IDX0${index}_${allFieldsTB[0].tableDefinitionName}] ON [dbo].[${allFieldsTB[0].tableDefinitionName}]
-    //                     (
-    //                       ${item.map((item) => (
-    //                         item ? `[${item}] ASC` : ''
-    //                       ))}
-    //                     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-    //                     GO
-    //                     ` : '';
-    //                   })
-    // let dataPost = `USE ${SCHEMA.value ? SCHEMA.value : '[SagawaCoreSystem]'}
-    //       GO
-
-    //       /****** ${allFieldsTB[0].tableName} ******/
-    //       /****** Object:  Table [dbo].[${allFieldsTB[0].tableDefinitionName}]    Script Date: ${toDay.toLocaleString()} ******/
-    //       SET ANSI_NULLS ON
-    //       GO
-
-    //       SET QUOTED_IDENTIFIER ON
-    //       GO
-    //       DROP TABLE IF EXISTS [dbo].[${allFieldsTB[0].tableDefinitionName}]
-    //       GO
-
-    //       CREATE TABLE [dbo].[${allFieldsTB[0].tableDefinitionName}](
-    //       ${fieldScript}
-    //       CONSTRAINT [PK_${allFieldsTB[0].tableDefinitionName}] PRIMARY KEY CLUSTERED 
-    //       (
-    //       ${keyPScript}
-    //       )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-    //       ) ON [PRIMARY]
-    //       GO
-    //       )
-          
-    //       ${execScript}
-    //       ${keySScript}
-          
-
-    //        `
-    // return dataPost
   }
+
+  // check validation
+  
+  const elementChangeInput = (nameField, valueField) => {
+    const blockEditor = document.querySelector(`.details-modal-content`)
+
+    const fieldType = ["columnName", "size", "primaryKey"]
+
+    const regExNumber = /^\s|([0-9]+)$/
+    if (nameField === ("size" || "primaryKey")) {
+      if (!valueField) {
+        valueField = ' '
+      }
+      if (regExNumber.test(valueField)) {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "green"
+        toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+        
+      } else {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "red"
+        toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be a number`)
+      }
+    }
+
+    const regExIdentity = /^\s|([0-9]+\,+[0-9]{0,10})$/
+    if (nameField === "identity") {
+      if (!valueField) {
+        valueField = ' '
+      }
+      if (regExIdentity.test(valueField)) {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "green"
+        toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+        
+      } else {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "red"
+        toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be have two number (1,1)`)
+      }
+    }
+
+    const regExColumnName = /^[A-Z0-9]{1,100}$|([A-Z0-9]+\_+[A-Z0-9]{1,100})$/
+    if (nameField === "columnName") {
+      if (regExColumnName.test(valueField)) {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "green"
+        toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+        
+      } else {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "red"
+        toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be uppercase character (TDB_GYOSHU_CD)`)
+      }
+    }
+  }
+  
+
+  const toggleStatus = (parent, classRemove, classAdd, content) => {
+    const isvalid = parent.querySelector(`.${classRemove}`)
+    if (!!!isvalid) return
+    isvalid.classList.remove(`${classRemove}`)
+    isvalid.classList.add(`${classAdd}`)
+    isvalid.innerHTML = `${content}`
+  }
+
 </script>
 
 </html>
