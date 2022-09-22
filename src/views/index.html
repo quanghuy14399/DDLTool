@@ -804,7 +804,7 @@
         for (const key in dataRender) {
           if (Object.hasOwnProperty.call(dataRender, key)) {
             // create input type checkbox
-            if(key === 'primaryKey' || key === 'allowNulls') {
+            if (key === 'primaryKey' || key === 'allowNulls') {
               templatedData += `
                 <div class="field-edit">
                   <label for="${key}">${key}</label>
@@ -815,7 +815,32 @@
                 <div class="space"></div>
               `
             }
-            else 
+            else if (key === 'dataType') {
+              templatedData += `
+                <div class="field-edit">
+                  <label for="${key}">${key}</label>
+                  <input oninput="elementChangeInput(this.name, this.value)" list="${key}s" id="${key}" name="${key}" value="${dataRender[key]}">
+                    <datalist id="${key}s">
+                      <option value="char">
+                      <option value="varchar">
+                      <option value="nchar">
+                      <option value="nvarchar">
+                      <option value="numeric">
+                      <option value="decimal">
+                      <option value="date">
+                      <option value="time">
+                      <option value="datetime">
+                      <option value="datetime2">
+                      <option value="int">
+                      <option value="bigint">
+                      <option value="smallint">
+                      <option value="tinyint">
+                    </datalist>
+                  </div>
+                </div>
+                <div class="space"></div>
+              `
+            } else
             templatedData += `
               <div class="field-edit">
                 <label for="${key}">${key}</label>
@@ -1388,22 +1413,6 @@
     const blockEditor = document.querySelector(`.details-modal-content`)
 
     const fieldType = ["columnName", "size", "primaryKey"]
-    const symbol = {
-      char : ["C", "char"],
-      varchar : ["VC", "VarChar", "varchar"],
-      nchar : ["NC", "nchar", "NChar"],
-      nvarchar : ["NVC", "nvarchar", "nvarchar2"],
-      numeric : ["N", "number", "numeric"],
-      decimal : ["DC", "decimal"],
-      date : ["D", "DATE", "date"],
-      time : ["T", "TIME", "time"],
-      datetime : ["DT", "DATETIME", "datetime"],
-      datetime2 : ["DT2", "DATETIME2", "datetime2"],
-      int : ["Int", "INT"],
-      bigint : ["Bigint", "BIGINT"],
-      smallint : ["Smallint", "SmallInt", "SMALLINT"],
-      tinyint : ["Tinyint", "TinyInt", "TINYINT"],
-    }
 
     const regExNumber = /^\s|([0-9]+)$/
     if (nameField === ("size" || "primaryKey")) {
