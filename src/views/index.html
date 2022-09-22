@@ -782,9 +782,9 @@
             const positionTableTbody = document.querySelector('#customers.one tbody')
             const positionTableThead = document.querySelector('#customers.one thead')
             // render detail table
-            renderTableDetailName(response.data[index])
-            renderTable(response.data[index].tableColInfos, positionTableTbody, positionTableThead)
-            catchElementClicked(response.data[index].tableColInfos)
+            renderTableDetailName(response.data[index].tableInfo)
+            renderTable(response.data[index].tableInfo.tableColInfos, positionTableTbody, positionTableThead)
+            catchElementClicked(response.data[index].tableInfo.tableColInfos)
           })
         })
       })
@@ -882,22 +882,23 @@
   });
   
   const renderTable = (datas, tbody, thead) => {
-    console.log(datas)
     let nameHeader = []
     let stringHeader = ``
     tbody.innerHTML = ``
     thead.innerHTML = ``
     // render data to table tbody 
     datas.forEach((data, index) => {
+
+      const dataTemp = data.tableInfo ? data.tableInfo : data
       let subElement = ''
-      for(let key in data) {
-        let value = data[key];
-        if (index === 1)
+      for(let key in dataTemp) {
+        let value = dataTemp[key];
+        if (index === 0)
           nameHeader.push(key)
         if (key === 'tableColInfos') {
           // tableColInfo ko render ra table
           continue
-        } else if (key === 'primaryKey' || key === 'allowNulls' || key === 'identity') {
+        } else if (key === 'primaryKey' || key === 'allowNulls') {
           subElement += `<td><input type="checkbox" ${value === '1' ? 'checked' : ''} disabled="true" /></td>`
         } else {
           subElement += `<td><div class="content">${value}</div></td>`
@@ -917,7 +918,7 @@
         `
     })
     thead.innerHTML = `
-      <tr>
+      <tr style="pointer-events: none">
         ${stringHeader}
       </tr>
     `
@@ -1398,7 +1399,7 @@
     if (!allFieldsTB) return
     await allFieldsTB.forEach((fieldTable, index, arr) => {
       fieldTable.excuteDate = toDay.toLocaleString()
-      fieldTable.dataBaseName = databaseName.value ? databaseName.value : 'SagawaTableCoreSystem'
+      fieldTable.databaseName = databaseName.value ? databaseName.value : 'SagawaTableCoreSystem'
       cmnItemFlg.forEach((ele, index, arr) => {
         if (ele.checked) fieldTable.cmnItemFlg = ele.value
         if (index === arr.length -1) {
@@ -1472,9 +1473,9 @@
       }
     }
 
-    const regExColumnName = /^[A-Z0-9]{1,100}$|([A-Z0-9]+\_+[A-Z0-9]{1,100})$/
-    if (nameField === "columnName") {
-      if (regExColumnName.test(valueField)) {
+    const regExColumnDefineName = /^[A-Z0-9]{1,100}$|([A-Z0-9]+\_+[A-Z0-9]{1,100})$/
+    if (nameField === "columnDefineName") {
+      if (regExColumnDefineName.test(valueField)) {
         const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
         elementEditorSelected.style.borderColor = "green"
         toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
