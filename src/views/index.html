@@ -697,7 +697,7 @@
   const SHEET_LIST_NAME_TABLE = 'テーブル一覧'
   const allFieldsTB = []
   // const listTableTemp = []
-  let dataBaseSelected = {}
+  let dataBaseSelected = []
   let indexSelected = 0
   let cellEdit = {}
 
@@ -716,14 +716,14 @@
         [`${idValue}`] : value
       }
     })
-    dataBaseSelected.tableColInfos[indexSelected] = {
+    dataBaseSelected[0].tableInfo.tableColInfos[indexSelected] = {
       ...cellEdit
     }
     const positionTableTbody = document.querySelector('#customers.one tbody')
     const positionTableThead = document.querySelector('#customers.one thead')
-    // render detail table
-    renderTable(dataBaseSelected.tableColInfos, positionTableTbody, positionTableThead)
-    catchElementClicked(dataBaseSelected.tableColInfos)
+    // render detail table tableColInfos
+    renderTable(dataBaseSelected[0].tableInfo.tableColInfos, positionTableTbody, positionTableThead)
+    catchElementClicked(dataBaseSelected[0].tableInfo.tableColInfos)
     const enableBtnReExecute = document.querySelector('#btn-re-execute')
     enableBtnReExecute.classList.remove('disabled')
     popupElement.style.display = 'none'
@@ -775,9 +775,9 @@
         const elementClicked = document.querySelectorAll('#customers.all tbody tr')
         elementClicked.forEach((element, index) => {
           element.addEventListener('click', () => {
-            dataBaseSelected = {
-              ...response.data[index]
-            }
+            dataBaseSelected = [
+              response.data[index]
+            ]
             let payload
             const positionTableTbody = document.querySelector('#customers.one tbody')
             const positionTableThead = document.querySelector('#customers.one thead')
@@ -875,10 +875,18 @@
   // catch click btn-re-execute
   const eventSaveTable = document.querySelector("#btn-re-execute")
   eventSaveTable.addEventListener("click", () => {
-    console.log('clicked btn-re-execute');
-    
-    const dataExecute = JSON.stringify(dataBaseSelected);
-    console.log(dataExecute, 'data execute');
+    console.log('clicked btn-re-execute', dataBaseSelected);
+    // const dataExecute = JSON.stringify(dataBaseSelected);
+    axios
+      .post("/table-registration", dataBaseSelected)
+      .then((response) => {
+        console.log(response.data, 'done processing')
+        alert('Update Table Successful')
+        location.reload();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   });
   
   const renderTable = (datas, tbody, thead) => {
@@ -895,7 +903,7 @@
         let value = dataTemp[key];
         if (index === 0)
           nameHeader.push(key)
-        if (key === 'tableColInfos') {
+        if (key === 'tableColInfos' || key === 'fieldKey') {
           // tableColInfo ko render ra table
           continue
         } else if (key === 'primaryKey' || key === 'allowNulls') {
@@ -912,10 +920,12 @@
     })
     // create table thead
     nameHeader.forEach((header, index) => {
-      if ( header != 'tableColInfos' )
-        stringHeader += `
-          <th>${header}</th>
-        `
+      if (header === "tableColInfos") return
+      if (header === "fieldKey") return
+      
+      stringHeader += `
+        <th>${header}</th>
+      `
     })
     thead.innerHTML = `
       <tr style="pointer-events: none">
@@ -1439,8 +1449,8 @@
       }
     })
   
-    const regExNumber = /^\s|([0-9]+)$/
-    if (nameField === ("size" || "primaryKey")) {
+    const regExNumber = /^\s|([0-9]+)|null$/
+    if (nameField === ("size" || "primaryKey" || "keyS1" || "keyS2" || "keyS3" || "keyS4")) {
       if (!valueField) {
         valueField = ' '
       }
@@ -1456,7 +1466,7 @@
       }
     }
 
-    const regExIdentity = /^\s|([0-9]+\,+[0-9]{0,10})$/
+    const regExIdentity = /^\s|([0-9]+\,+[0-9]{1,10})|null$/
     if (nameField === "identity") {
       if (!valueField) {
         valueField = ' '
