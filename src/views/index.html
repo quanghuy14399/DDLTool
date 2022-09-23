@@ -769,9 +769,22 @@
         const positionTableTbody = document.querySelector('#customers.all tbody')
         const positionTableThead = document.querySelector('#customers.all thead')
         console.log(response.data, 'done processing')
-        
+        const historyTable = response.data.map((element) => {
+          return {
+            tableDefinitionName: element.tableInfo.tableDefinitionName,
+            tableName: element.tableInfo.tableName,
+            databaseName: element.databaseName,
+            description: element.description,
+            createUserId: element.createUserId,
+            createDateTime: new Date(element.createDateTime),
+            updateUserId: element.updateUserId,
+            updateDateTime: new Date(element.updateDateTime),
+            excuteDate: element.tableInfo.excuteDate,
+            version: element.version,
+          }
+        })
         // render table all from DB
-        renderTable(response.data, positionTableTbody, positionTableThead)
+        renderTable(historyTable, positionTableTbody, positionTableThead)
         const elementClicked = document.querySelectorAll('#customers.all tbody tr')
         elementClicked.forEach((element, index) => {
           element.addEventListener('click', () => {
