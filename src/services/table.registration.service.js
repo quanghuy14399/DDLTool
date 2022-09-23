@@ -169,22 +169,39 @@ const getStrDropIndex = async (chkFlag, strIdx, tableName) => {
 const executeTableRegistrationService = async (req) => {
   console.log(" Start table registration service... ");
   try {
-    const tableColInfo = await createTableMst(req.body);
-    const result =
-      await tableRegistrationReposistory.executeTableRegistrationRepository(
-        tableColInfo
-      );
-    if (result === 200) {
-      const insertParams = {
-        databaseName: req.body.databaseName,
-        tableName: req.body.tableDefinitionName,
-        description: req.body.remarks,
-        tableInfo: req.body,
-      };
-      return await tableListReposistory.insertTableListRepository(insertParams);
-    }
+    await req.body.forEach(async (element) => {
+      const tableColInfo = await createTableMst(element);
+      const result =
+        await tableRegistrationReposistory.executeTableRegistrationRepository(
+          tableColInfo
+        );
+      if (result === 200) {
+        const insertParams = {
+          databaseName: element.databaseName,
+          tableName: element.tableDefinitionName,
+          description: element.remarks,
+          tableInfo: element,
+        };
+        await tableListReposistory.insertTableListRepository(insertParams);
+      }
+    });
+    return {
+      httpStatuscode: 200,
+      data: {
+        message: "SUCCESS",
+        errorCode: null,
+        errorMessage: null,
+      },
+    };
   } catch (error) {
     console.log(" Table registration service ERROR!!!", error.message);
+    return {
+      httpStatuscode: 400,
+      data: {
+        errorCode: "SQL-ERROR",
+        errorMessage: error.message,
+      },
+    };
   }
 };
 
