@@ -899,11 +899,9 @@
     axios
       .post("/table-registration", payload)
       .then((response) => {
-        if (response.data.httpStatuscode === 200) {
+        if (response.message === "SUCCESS") {
           alert('Update Table Successful')
-          // location.reload();
-        } else {
-          alert('Update Table Fail' + response.data.data.message + response.data.data.errorMessage)
+          location.reload();
         }
       })
       .catch((error) => {

@@ -51,7 +51,7 @@ const insertTableListRepository = async (req) => {
     return {
       httpStatuscode: 200,
       data: {
-        message:"SECCESS",
+        message:"SUCCESS",
         errorCode: null,
         errorMessage: null,
       },
