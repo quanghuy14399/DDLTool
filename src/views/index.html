@@ -1476,7 +1476,7 @@
     const fieldType = ["columnName", "size", "primaryKey"]
     const inputSelection = document.querySelector('input[list]');
     const datalistSelection = Array.prototype.slice.call(document.querySelectorAll(`#${nameField}s option`));
-
+    // catch event select list dataType
     inputSelection.addEventListener('keyup', () => {
       let optionFound = false
       const haveInDataList = datalistSelection.find((item) => (item.value == inputSelection.value))
@@ -1491,11 +1491,13 @@
       }
     })
   
-    const regExNumber = /^\s|([0-9]+)|null$/
-    if (nameField === ("size" || "primaryKey" || "keyS1" || "keyS2" || "keyS3" || "keyS4")) {
+    // check value size
+    const regExNumber = /^null|\s|\d$/
+    const fieldNumber = ["size" , "primaryKey" , "keyS1" , "keyS2" , "keyS3" , "keyS4"]
+    if (fieldNumber.includes(nameField)) {
       if (nameField === "size") {
         const checkDataType = document.querySelector('#dataType')
-        if (checkDataType.value === ("bigint" || "int") && regExNumber.test(valueField)) {
+        if ((checkDataType.value === "bigint" || checkDataType.value === "int") && regExNumber.test(valueField)) {
           const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
           elementEditorSelected.style.borderColor = "red"
           toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} is not isvalid with dataType (bigint, int)`)
@@ -1516,7 +1518,7 @@
         toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be a number`)
       }
     }
-
+    // check value Identity
     const regExIdentity = /^\s|([0-9]+\,+[0-9]{1,10})|null$/
     if (nameField === "identity") {
       if (!valueField) {
@@ -1533,7 +1535,7 @@
         toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be have two number (1,1)`)
       }
     }
-
+    // check value ColumnDefineName
     const regExColumnDefineName = /^[A-Z0-9]{1,100}$|([A-Z0-9]+\_+[A-Z0-9]{1,100})$/
     if (nameField === "columnDefineName") {
       if (regExColumnDefineName.test(valueField)) {
@@ -1547,6 +1549,29 @@
         toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be uppercase character (TDB_GYOSHU_CD)`)
       }
     }
+    // check value defaultValue
+    const typeNumber = ["bigint" , "int" , "smallint" , "tinyint"]
+    if (nameField === "defaultValue") {
+      const checkDataType = document.querySelector('#dataType')
+      if (typeNumber.includes(checkDataType.value)) {
+        if (!valueField) {
+          valueField = ' '
+        }
+        if (regExNumber.test(valueField)) {
+          const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+          elementEditorSelected.style.borderColor = "green"
+          toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+        } else {
+          const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+          elementEditorSelected.style.borderColor = "red"
+          toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} must be a number`)
+        }
+      } else {
+        const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+        elementEditorSelected.style.borderColor = "green"
+        toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
+      }
+    } 
   }
   
 
