@@ -24,6 +24,7 @@ const getTableListRepository = async (req) => {
     return {
       httpStatuscode: 400,
       data: {
+        message: "ERROR",
         errorCode: "SQL-ERROR",
         errorMessage: error.message,
       },
