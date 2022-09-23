@@ -79,7 +79,7 @@ let createTableMst = async (resBody) => {
         element.dataType +
         sqlConstant.CNS_KK2;
 
-      if (element.size !== null) {
+      if (element.size !== null || element.size !== "null") {
         strCreteColumn +=
           sqlConstant.CNS_SPC +
           sqlConstant.CNS_KK3 +
@@ -93,7 +93,7 @@ let createTableMst = async (resBody) => {
         strCreteColumn += sqlConstant.CNS_SPC + "NOT NULL";
       }
 
-      if (element.defaultValue !== null) {
+      if (element.defaultValue != null || element.defaultValue !== "null") {
         strCreteColumn += sqlConstant.CNS_SPC + "DEFAULT" + sqlConstant.CNS_KK3;
         if (element.defaultValue === "") {
           strCreteColumn += "''";
