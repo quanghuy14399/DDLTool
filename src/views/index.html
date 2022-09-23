@@ -766,6 +766,7 @@
     await axios
       .post("/table-list", {})
       .then((response) => {
+        if (!response.data.length) return
         const positionTableTbody = document.querySelector('#customers.all tbody')
         const positionTableThead = document.querySelector('#customers.all thead')
         // console.log(response.data, 'done processing')
@@ -785,18 +786,22 @@
         })
         // render table all from DB
         renderTable(historyTable, positionTableTbody, positionTableThead)
+        // render first record
+        const positionSubTableTbody = document.querySelector('#customers.one tbody')
+        const positionSubTableThead = document.querySelector('#customers.one thead')
+        renderTableDetailName(response.data[0])
+        renderTable(response.data[0].tableInfo.tableColInfos, positionSubTableTbody, positionSubTableThead)
+        catchElementClicked(response.data[0].tableInfo.tableColInfos)
+
         const elementClicked = document.querySelectorAll('#customers.all tbody tr')
         elementClicked.forEach((element, index) => {
           element.addEventListener('click', () => {
             dataBaseSelected = [
               response.data[index]
             ]
-            let payload
-            const positionTableTbody = document.querySelector('#customers.one tbody')
-            const positionTableThead = document.querySelector('#customers.one thead')
             // render detail table
-            renderTableDetailName(response.data[index].tableInfo)
-            renderTable(response.data[index].tableInfo.tableColInfos, positionTableTbody, positionTableThead)
+            renderTableDetailName(response.data[index])
+            renderTable(response.data[index].tableInfo.tableColInfos, positionSubTableTbody, positionSubTableThead)
             catchElementClicked(response.data[index].tableInfo.tableColInfos)
           })
         })
@@ -955,7 +960,7 @@
   }
 
   const renderTableDetailName = (tableDetail) => {
-    document.querySelector('#table-name').innerHTML = tableDetail.tableName
+    document.querySelector('#table-name').innerHTML = tableDetail.tableInfo.tableName
     document.querySelector('#table-version').innerHTML = tableDetail.version
   }
   
@@ -1182,38 +1187,40 @@
       changeHistoryTable()
       generator()
     }
-    let errorLoop = false;
     let notification = []
     await Promise.all(
-      allFieldsTB.map(async (iterator, index, arr) => {
-        if (errorLoop) return
+      allFieldsTB.map( async (iterator, index, arr) => {
         const tableTemp = [iterator]
-        const checkAsync = await asyncFunc(tableTemp, errorLoop, notification, iterator.tableDefinitionName)
-        if (index === arr.length - 1) {
-          let temp = ``
-          notification.forEach((title) => {
-            temp += title + '\n'
-          })
-          alert(temp)
-        }
+        const checkRes = await asyncFunc(tableTemp, notification, iterator.tableDefinitionName).then((result) => {
+          // console.log(result.length, '-', arr.length);
+          if (result.length === arr.length) {
+            let temp = ``
+            notification.forEach((title) => {
+              temp += title + '\n'
+            })
+            alert(temp)
+            location.reload();
+          }
+        })
       })
     )
     
   })
 
-  const asyncFunc = async (tableTemp, errorLoop, notification, tableDefinitionName) => {
+  const asyncFunc = async (tableTemp, notification, tableDefinitionName) => {
     return await axios
                     .post("/table-registration", tableTemp)
                     .then((response) => {
                       if (response.data.message === "SUCCESS") {
-                        notification.push(`${tableDefinitionName} done`)
+                        notification.push(`${tableDefinitionName} was created`)
+                        return notification
                       } else {
-                        // alert('Insert Table Fail' + response.data.data.message + response.data.data.errorMessage)
+                        alert('Insert Table Fail' + response.data.message)
                       }
                     })
                     .catch((error, response) => {
-                      errorLoop = true
                       notification.push(error.response.data.errorMessage)
+                      return notification
                     })
   }
   
