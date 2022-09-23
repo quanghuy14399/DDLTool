@@ -899,7 +899,7 @@
     axios
       .post("/table-registration", payload)
       .then((response) => {
-        if (response.message === "SUCCESS") {
+        if (response.data.message === "SUCCESS") {
           alert('Update Table Successful')
           location.reload();
         }
@@ -1195,13 +1195,12 @@
     
   })
 
-  const asycnFunc = async (tableTemp, errorLoop) => {
+  const asyncFunc = async (tableTemp, errorLoop) => {
     return await axios
                     .post("/table-registration", tableTemp)
                     .then((response) => {
                       if (response.data.httpStatuscode === 200) {
                         return true
-                        // location.reload();
                       } else {
                         // alert('Insert Table Fail' + response.data.data.message + response.data.data.errorMessage)
                       }
