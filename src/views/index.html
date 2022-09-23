@@ -768,7 +768,7 @@
       .then((response) => {
         const positionTableTbody = document.querySelector('#customers.all tbody')
         const positionTableThead = document.querySelector('#customers.all thead')
-        console.log(response.data, 'done processing')
+        // console.log(response.data, 'done processing')
         const historyTable = response.data.map((element) => {
           return {
             tableDefinitionName: element.tableInfo.tableDefinitionName,
@@ -888,7 +888,7 @@
   // catch click btn-re-execute
   const eventSaveTable = document.querySelector("#btn-re-execute")
   eventSaveTable.addEventListener("click", () => {
-    console.log('clicked btn-re-execute', dataBaseSelected);
+    // console.log('clicked btn-re-execute', dataBaseSelected);
     // const dataExecute = JSON.stringify(dataBaseSelected);
     dataBaseSelected[0].tableInfo.tableColInfos.forEach((element) => {
       if (element.columnDefineName === "VERSION") {
@@ -1026,7 +1026,7 @@
         inputFileUI.style.display = 'block'
         return alert('Sheet is not available')
       }
-      console.log(listTableTemp); // will show devices array
+      // console.log(listTableTemp); // will show devices array
       const lastItem = listTableTemp.length - 1
       let error = false
       await listTableTemp.forEach( async (element, index) => {
@@ -1067,7 +1067,7 @@
           }
           allFieldsTB.push({ ...tbCellCommon, tableColInfos , fieldKey })
           if(index === lastItem) {
-            allFieldsData(allFieldsTB)
+            // allFieldsData(allFieldsTB)
             inputFileUploaded.style.display = 'block'
             document.getElementById('fileName').innerText = input.files[0].name
             document.getElementById('fileSize').innerText = (input.files[0].size / 1048576).toFixed(2) + 'MB'
@@ -1088,7 +1088,7 @@
   }
 
   const allFieldsData = (data) => {
-    console.log(data, 'done');
+    // console.log(data, 'done');
   }
 
   const nullToEmptyString = (value) => {
@@ -1183,32 +1183,37 @@
       generator()
     }
     let errorLoop = false;
+    let notification = []
     await Promise.all(
-      allFieldsTB.map(async (iterator, index) => {
+      allFieldsTB.map(async (iterator, index, arr) => {
         if (errorLoop) return
         const tableTemp = [iterator]
-        const checkAsync = await asycnFunc(tableTemp, errorLoop)
-        console.count(checkAsync, 'checkAsync');
-        if (!checkAsync) return
+        const checkAsync = await asyncFunc(tableTemp, errorLoop, notification, iterator.tableDefinitionName)
+        if (index === arr.length - 1) {
+          let temp = ``
+          notification.forEach((title) => {
+            temp += title + '\n'
+          })
+          alert(temp)
+        }
       })
     )
     
   })
 
-  const asyncFunc = async (tableTemp, errorLoop) => {
+  const asyncFunc = async (tableTemp, errorLoop, notification, tableDefinitionName) => {
     return await axios
                     .post("/table-registration", tableTemp)
                     .then((response) => {
-                      if (response.data.httpStatuscode === 200) {
-                        return true
+                      if (response.data.message === "SUCCESS") {
+                        notification.push(`${tableDefinitionName} done`)
                       } else {
                         // alert('Insert Table Fail' + response.data.data.message + response.data.data.errorMessage)
                       }
                     })
                     .catch((error, response) => {
                       errorLoop = true
-                      console.count(error.response.data.errorMessage);
-                      return false
+                      notification.push(error.response.data.errorMessage)
                     })
   }
   
@@ -1460,7 +1465,7 @@
         if (ele.checked) fieldTable.checkExistTable = ele.value
       })
     })
-    console.log(allFieldsTB,'after all');
+    // console.log(allFieldsTB,'after all');
   }
 
   // check validation
