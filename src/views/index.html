@@ -890,12 +890,21 @@
   eventSaveTable.addEventListener("click", () => {
     console.log('clicked btn-re-execute', dataBaseSelected);
     // const dataExecute = JSON.stringify(dataBaseSelected);
+    dataBaseSelected[0].tableInfo.tableColInfos.forEach((element) => {
+      if (element.columnDefineName === "VERSION") {
+        element
+      }
+    })
+    const payload = [dataBaseSelected[0].tableInfo]
     axios
-      .post("/table-registration", dataBaseSelected)
+      .post("/table-registration", payload)
       .then((response) => {
-        console.log(response.data, 'done processing')
-        alert('Update Table Successful')
-        location.reload();
+        if (response.data.httpStatuscode === 200) {
+          alert('Update Table Successful')
+          // location.reload();
+        } else {
+          alert('Update Table Fail' + response.data.data.message + response.data.data.errorMessage)
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -1168,25 +1177,43 @@
   // btn-save-table
   let controlRender = 0
   const btnSaveTable = document.querySelector('#btn-save-table')
-  btnSaveTable.addEventListener('click', () => {
+  btnSaveTable.addEventListener('click', async () => {
     controlRender++
     console.count('btn-save-table clicked');
     if (controlRender === 1) {
       changeHistoryTable()
       generator()
     }
-      
-    axios
-      .post("/table-registration", {...allFieldsTB[0]})
-      .then((response) => {
-        console.log(response.data, 'done processing')
-        alert('Insert Table Successful')
-        location.reload();
+    let errorLoop = false;
+    await Promise.all(
+      allFieldsTB.map(async (iterator, index) => {
+        if (errorLoop) return
+        const tableTemp = [iterator]
+        const checkAsync = await asycnFunc(tableTemp, errorLoop)
+        console.count(checkAsync, 'checkAsync');
+        if (!checkAsync) return
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    )
+    
   })
+
+  const asycnFunc = async (tableTemp, errorLoop) => {
+    return await axios
+                    .post("/table-registration", tableTemp)
+                    .then((response) => {
+                      if (response.data.httpStatuscode === 200) {
+                        return true
+                        // location.reload();
+                      } else {
+                        // alert('Insert Table Fail' + response.data.data.message + response.data.data.errorMessage)
+                      }
+                    })
+                    .catch((error, response) => {
+                      errorLoop = true
+                      console.count(error.response.data.errorMessage);
+                      return false
+                    })
+  }
   
   // change value selected
   const changeValueSelect = async (property, value) => {
@@ -1464,6 +1491,15 @@
   
     const regExNumber = /^\s|([0-9]+)|null$/
     if (nameField === ("size" || "primaryKey" || "keyS1" || "keyS2" || "keyS3" || "keyS4")) {
+      if (nameField === "size") {
+        const checkDataType = document.querySelector('#dataType')
+        if (checkDataType.value === ("bigint" || "int") && regExNumber.test(valueField)) {
+          const elementEditorSelected = blockEditor.querySelector(`input[name="${nameField}"]`)
+          elementEditorSelected.style.borderColor = "red"
+          toggleStatus(blockEditor, 'isvalid', 'not-isvalid', `${nameField} is not isvalid with dataType (bigint, int)`)
+          return
+        }
+      }
       if (!valueField) {
         valueField = ' '
       }
