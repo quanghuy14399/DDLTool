@@ -21,12 +21,11 @@ const executeTableRegistrationRepository = async (req) => {
       .replace(/N+\s+\'/g, `N'`)
       .replace(/\sGO(?! \s)/g, "\n");
     console.log("Start table registration sql query: ", stringAfter);
-
     const result = await dbConfig.createOrUpdateTable(stringAfter, req.strDB);
-
-    return result.httpStatuscode;
+    return result;
+    
   } catch (error) {
-    console.error("Table registration repository ERROR!", error.message);
+    console.log("Table registration repository ERROR!", error.message);
     return {
       httpStatuscode: 400,
       data: {

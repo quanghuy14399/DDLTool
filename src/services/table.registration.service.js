@@ -79,7 +79,7 @@ let createTableMst = async (resBody) => {
         element.dataType +
         sqlConstant.CNS_KK2;
 
-      if (element.size !== null || element.size !== "null") {
+      if (element.size !== null && element.size !== "null" && element.size !== "") {
         strCreteColumn +=
           sqlConstant.CNS_SPC +
           sqlConstant.CNS_KK3 +
@@ -93,7 +93,7 @@ let createTableMst = async (resBody) => {
         strCreteColumn += sqlConstant.CNS_SPC + "NOT NULL";
       }
 
-      if (element.defaultValue != null || element.defaultValue !== "null") {
+      if (element.defaultValue != null && element.defaultValue !== "null") {
         strCreteColumn += sqlConstant.CNS_SPC + "DEFAULT" + sqlConstant.CNS_KK3;
         if (element.defaultValue === "") {
           strCreteColumn += "''";
@@ -169,30 +169,31 @@ const getStrDropIndex = async (chkFlag, strIdx, tableName) => {
 const executeTableRegistrationService = async (req) => {
   console.log(" Start table registration service... ");
   try {
-    await req.body.forEach(async (element) => {
-      const tableColInfo = await createTableMst(element);
+    
+    for (const iterator of req.body) {
+      console.log(iterator, 'ahihi');
+      const tableColInfo = await createTableMst(iterator);
       const result =
         await tableRegistrationReposistory.executeTableRegistrationRepository(
           tableColInfo
         );
-      if (result === 200) {
+      if (result.httpStatuscode === 200) {
+        console.log(" Start inserting history... ");
         const insertParams = {
-          databaseName: element.databaseName,
-          tableName: element.tableDefinitionName,
-          description: element.remarks,
-          tableInfo: element,
+          databaseName: iterator.databaseName,
+          tableName: iterator.tableDefinitionName,
+          description: iterator.remarks,
+          tableInfo: iterator,
         };
-        await tableListReposistory.insertTableListRepository(insertParams);
+        return await tableListReposistory.insertTableListRepository(insertParams);
+      }else{
+        console.log('toiws ddaau k', result);
+        return result;
       }
-    });
-    return {
-      httpStatuscode: 200,
-      data: {
-        message: "SUCCESS",
-        errorCode: null,
-        errorMessage: null,
-      },
-    };
+    }
+    // await req.body.forEach(async (element) => {
+      
+    // });
   } catch (error) {
     console.log(" Table registration service ERROR!!!", error.message);
     return {

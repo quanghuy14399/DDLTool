@@ -47,15 +47,21 @@ const insertTableListRepository = async (req) => {
     const result = await dbConfig.excuteScript(
       strSql.replace(/N+\s+\'/g, `N'`)
     );
+
     return {
       httpStatuscode: 200,
-      data: result.data,
+      data: {
+        message:"SECCESS",
+        errorCode: null,
+        errorMessage: null,
+      },
     };
   } catch (error) {
     console.error("insert list repository ERROR!", error.message);
     return {
       httpStatuscode: 400,
       data: {
+        message:"ERROR",
         errorCode: "SQL-ERROR",
         errorMessage: error.message,
       },

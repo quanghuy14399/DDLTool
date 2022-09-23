@@ -42,6 +42,14 @@ const excuteScript = async (sqlQuery) => {
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not execute the query ");
+    return {
+      httpStatuscode: 400,
+      data: {
+        message: "ERROR",
+        errorCode: "SQL-ERROR",
+        errorMessage: err.message,
+      },
+    };
   }
 };
 
@@ -66,7 +74,15 @@ const createOrUpdateTable = async (sqlQuery, schemaName) => {
       data: result.recordset,
     };
   } catch (err) {
-    console.log(err, "ERROR ! Can not create table ");
+    console.log(err.message, "ERROR ! Can not create table ");
+    return {
+      httpStatuscode: 400,
+      data: {
+        message:"ERROR",
+        errorCode: "SQL-ERROR",
+        errorMessage: err.message,
+      },
+    };
   }
 };
 
