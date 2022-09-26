@@ -740,6 +740,7 @@
         [`${idValue}`] : value
       }
     })
+    console.log(dataBaseSelected, 'dataBaseSelected');
     dataBaseSelected[0].tableInfo.tableColInfos[indexSelected] = {
       ...cellEdit
     }
@@ -813,6 +814,9 @@
         // render first record
         const positionSubTableTbody = document.querySelector('#customers.one tbody')
         const positionSubTableThead = document.querySelector('#customers.one thead')
+        dataBaseSelected = [
+          response.data[0]
+        ]
         renderTableDetailName(response.data[0])
         renderTable(response.data[0].tableInfo.tableColInfos, positionSubTableTbody, positionSubTableThead)
         catchElementClicked(response.data[0].tableInfo.tableColInfos)
@@ -1491,7 +1495,7 @@
         if (ele.checked) fieldTable.cmnItemFlg = ele.value
         if (index === arr.length -1) {
           if (fieldTable.cmnItemFlg === "1") {
-            fieldTable.tableColInfos.push(...commonItem)
+            fieldTable.tableColInfos?.push(...commonItem)
           }
         }
       })
