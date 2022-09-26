@@ -507,7 +507,6 @@
 
 <body>
   <div>
-    <h1 class="text-center">DDL Tool</h1>
     <div class="container">
       <section class="sidebar-left">
         <div class="history-table">
@@ -639,6 +638,9 @@
           </div>
           <div class="space"></div>
           <div class="button mx-auto w-200 disabled" id="btn-save-table">SAVE TABLE</div>
+          <div class="process-file">
+            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+          </div>
         </div>
       </section>
     </div>
@@ -647,6 +649,22 @@
       <div class="details-modal">
         <div class="details-modal-title"> 
           <h1>Edit Detail Table</h1>
+          <div class="details-modal-close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M13.7071 1.70711C14.0976 1.31658 14.0976 0.683417 13.7071 0.292893C13.3166 -0.0976311 12.6834 -0.0976311 12.2929 0.292893L7 5.58579L1.70711 0.292893C1.31658 -0.0976311 0.683417 -0.0976311 0.292893 0.292893C-0.0976311 0.683417 -0.0976311 1.31658 0.292893 1.70711L5.58579 7L0.292893 12.2929C-0.0976311 12.6834 -0.0976311 13.3166 0.292893 13.7071C0.683417 14.0976 1.31658 14.0976 1.70711 13.7071L7 8.41421L12.2929 13.7071C12.6834 14.0976 13.3166 14.0976 13.7071 13.7071C14.0976 13.3166 14.0976 12.6834 13.7071 12.2929L8.41421 7L13.7071 1.70711Z" fill="black" />
+            </svg>
+          </div>
+        </div>
+        <div class="details-modal-content">
+          <p class="isvalid"></p>
+        </div>
+      </div>
+    </section>
+    <section id="modal-popup-message" class="d-none">
+      <div class="details-modal-overlay"></div>
+      <div class="details-modal">
+        <div class="details-modal-title"> 
+          <h1>Message: </h1>
           <div class="details-modal-close">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M13.7071 1.70711C14.0976 1.31658 14.0976 0.683417 13.7071 0.292893C13.3166 -0.0976311 12.6834 -0.0976311 12.2929 0.292893L7 5.58579L1.70711 0.292893C1.31658 -0.0976311 0.683417 -0.0976311 0.292893 0.292893C-0.0976311 0.683417 -0.0976311 1.31658 0.292893 1.70711L5.58579 7L0.292893 12.2929C-0.0976311 12.6834 -0.0976311 13.3166 0.292893 13.7071C0.683417 14.0976 1.31658 14.0976 1.70711 13.7071L7 8.41421L12.2929 13.7071C12.6834 14.0976 13.3166 14.0976 13.7071 13.7071C14.0976 13.3166 14.0976 12.6834 13.7071 12.2929L8.41421 7L13.7071 1.70711Z" fill="black" />
@@ -703,8 +721,14 @@
 
   // modal
   const popupElement = document.querySelector('#modal-popup')
+  const popupMessageElement = document.querySelector('#modal-popup-message')
   const closePopupElement = popupElement.querySelector('.details-modal-close')
   
+  // close message modal popup
+  const positionClosePopup = popupMessageElement.querySelector('.details-modal-close')
+  positionClosePopup.addEventListener('click', () => {
+    location.reload()
+  })
   // close the modal popup
   const closeTheModalPopup = () => {
     const elementData = popupElement.querySelectorAll('input')
@@ -1034,7 +1058,7 @@
       // console.log(listTableTemp); // will show devices array
       const lastItem = listTableTemp.length - 1
       let error = false
-      await listTableTemp.forEach( async (element, index) => {
+      for (const element of listTableTemp) {
         await readXlsxFile(input.files[0], { sheet: element }).then((rows) => {
           tbCellCommon.nameSystem = nullToEmptyString(rows[1][17])
           tbCellCommon.titleTable = nullToEmptyString(rows[2][1])
@@ -1071,24 +1095,19 @@
             ...getDataOfFieldKey(rows)
           }
           allFieldsTB.push({ ...tbCellCommon, tableColInfos , fieldKey })
-          if(index === lastItem) {
-            // allFieldsData(allFieldsTB)
-            inputFileUploaded.style.display = 'block'
-            document.getElementById('fileName').innerText = input.files[0].name
-            document.getElementById('fileSize').innerText = (input.files[0].size / 1048576).toFixed(2) + 'MB'
-          }
         })
         .catch((e) => {
           console.log(e, 'Exception');
           error = true
         })
-        .finally(() => {
-          loading.style.display = 'none'
-          const btnSaveTable = document.querySelector('#btn-save-table')
-          btnSaveTable.classList.remove('disabled')
-        })
-        
-      })
+      }
+      // console.log(allFieldsTB, 'allfield');
+      loading.style.display = 'none'
+      const btnSaveTable = document.querySelector('#btn-save-table')
+      btnSaveTable.classList.remove('disabled')
+      inputFileUploaded.style.display = 'block'
+      document.getElementById('fileName').innerText = input.files[0].name
+      document.getElementById('fileSize').innerText = (input.files[0].size / 1048576).toFixed(2) + 'MB'
     },1000)
   }
 
@@ -1176,7 +1195,8 @@
       // }
     }
   }
-
+  // loading when click save-table
+  const processFileLoading = document.querySelector('.process-file .lds-ring')
   // btn-save-table
   let controlRender = 0
   const btnSaveTable = document.querySelector('#btn-save-table')
@@ -1188,6 +1208,7 @@
       generator()
     }
     let notification = []
+    processFileLoading.style.display = "block"
     await Promise.all(
       allFieldsTB.map( async (iterator, index, arr) => {
         const tableTemp = [iterator]
@@ -1195,11 +1216,13 @@
           // console.log(result.length, '-', arr.length);
           if (result.length === arr.length) {
             let temp = ``
-            notification.forEach((title) => {
-              temp += title + '\n'
-            })
-            alert(temp)
-            location.reload();
+            for (const title of notification) {
+              temp += title
+            }
+            processFileLoading.style.display = "none"
+            popupMessageElement.style.display = 'block'
+            const positionRenderData = popupMessageElement.querySelector('.details-modal-content')
+            positionRenderData.innerHTML = temp
           }
         })
       })
@@ -1208,20 +1231,25 @@
   })
 
   const asyncFunc = async (tableTemp, notification, tableDefinitionName) => {
-    return await axios
+    try {
+      return await axios
                     .post("/table-registration", tableTemp)
                     .then((response) => {
                       if (response.data.message === "SUCCESS") {
-                        notification.push(`${tableDefinitionName} was created`)
+                        notification.push(`<p style="color: green">${tableDefinitionName} was created<p>`)
                         return notification
                       } else {
                         alert('Insert Table Fail' + response.data.message)
                       }
                     })
                     .catch((error, response) => {
-                      notification.push(error.response.data.errorMessage)
+                      notification.push(`<p style="color: red">${tableDefinitionName} ${error.response.data.errorMessage}</p>`)
                       return notification
                     })
+    } catch (error) {
+      console.log(error, 'error');
+    }
+    
   }
   
   // change value selected
@@ -1456,7 +1484,7 @@
 
     ]
     if (!allFieldsTB) return
-    await allFieldsTB.forEach((fieldTable, index, arr) => {
+    for (const fieldTable of allFieldsTB) {
       fieldTable.excuteDate = toDay.toLocaleString()
       fieldTable.databaseName = databaseName.value ? databaseName.value : 'SagawaTableCoreSystem'
       cmnItemFlg.forEach((ele, index, arr) => {
@@ -1471,8 +1499,7 @@
       checkExistTable.forEach(ele => {
         if (ele.checked) fieldTable.checkExistTable = ele.value
       })
-    })
-    // console.log(allFieldsTB,'after all');
+    }
   }
 
   // check validation
