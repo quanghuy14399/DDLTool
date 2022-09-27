@@ -1134,34 +1134,49 @@
         if (value[indexSub][element]) {
           if (element === 35) {
             let dataTemp = value[indexSub][16]
-            keyP.push(dataTemp)
+            keyP.push({
+              name: dataTemp,
+              value: value[indexSub][element]
+            })
           }
           if (element === 37) {
             let dataTemp = value[indexSub][16]
-            keyS1.push(dataTemp)
+            keyS1.push({
+              name: dataTemp,
+              value: value[indexSub][element]
+            })
           }
           if (element === 39) {
             let dataTemp = value[indexSub][16]
-            keyS2.push(dataTemp)
+            keyS2.push({
+              name: dataTemp,
+              value: value[indexSub][element]
+            })
           }
           if (element === 41) {
             let dataTemp = value[indexSub][16]
-            keyS3.push(dataTemp)
+            keyS3.push({
+              name: dataTemp,
+              value: value[indexSub][element]
+            })
           }
           if (element === 43) {
             let dataTemp = value[indexSub][16]
-            keyS4.push(dataTemp)
+            keyS4.push({
+              name: dataTemp,
+              value: value[indexSub][element]
+            })
           }
           
         }
       }
     })
-    data.p = keyP
-    data.s1 = keyS1
-    data.s2 = keyS2
-    data.s3 = keyS3
-    data.s4 = keyS4
-    
+    data.p = keyP.sort((a, b) => a.value - b.value).map(element => element.name)
+    data.s1 = keyS1.sort((a, b) => a.value - b.value).map(element => element.name)
+    data.s2 = keyS2.sort((a, b) => a.value - b.value).map(element => element.name)
+    data.s3 = keyS3.sort((a, b) => a.value - b.value).map(element => element.name)
+    data.s4 = keyS4.sort((a, b) => a.value - b.value).map(element => element.name)
+
     return data
   }
 
@@ -1655,11 +1670,11 @@
   }
 
   // add or remove fieldKey
-  const addOrRemoveFieldKey = (keyname, action) => {
-    if (action) {
+  const addOrRemoveFieldKey = (keyname, valueField) => {
+    if (!!(Number(valueField) > 0)) {
         // if field don't exist in primary key => add
         if (!dataBaseSelected[0].tableInfo.fieldKey[keyname].includes(document.querySelector('#columnDefineName').value)) {
-          dataBaseSelected[0].tableInfo.fieldKey[keyname].push(document.querySelector('#columnDefineName').value)
+          dataBaseSelected[0].tableInfo.fieldKey[keyname].splice(valueField-1, 0, document.querySelector('#columnDefineName').value);
         }
       } else {
         // if field exist in primary key => remove
