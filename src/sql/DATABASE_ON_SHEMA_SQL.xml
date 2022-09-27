@@ -48,7 +48,7 @@
          /****** Object:  Index [IDX01_${strTBL}]    Script Date: ${excuteDate} ******/
             ${strDRPIDX01}
             GO
-            CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
+            CREATE NONCLUSTERED INDEX [IDX01_${strTBL}] ON [dbo].[${strTBL}]
             (
              <foreach item="item" index="index" collection="arrS1" separator=",">
 	            [${item}] ASC
@@ -67,9 +67,9 @@
          /****** Object:  Index [IDX02_${strTBL}]    Script Date: ${excuteDate} ******/
             ${strDRPIDX02}
             GO
-             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
+             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL}]
             (
-             <foreach item="item" index="index" collection="${arrS2}" separator=",">
+             <foreach item="item" index="index" collection="arrS2" separator=",">
 	            [${item}] ASC
              </foreach>
             )
@@ -86,7 +86,7 @@
          /****** Object:  Index [IDX03_${strTBL}]    Script Date: ${excuteDate} ******/
             ${strDRPIDX03}
             GO
-             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
+             CREATE NONCLUSTERED INDEX [IDX03_${strTBL}] ON [dbo].[${strTBL}]
             (
              <foreach item="item" index="index" collection="arrS3" separator=",">
 	            [${item}] ASC
@@ -105,7 +105,7 @@
          /****** Object:  Index [IDX04_${strTBL}]    Script Date: ${excuteDate} ******/
             ${strDRPIDX04}
             GO
-             CREATE NONCLUSTERED INDEX [IDX02_${strTBL}] ON [dbo].[${strTBL]
+             CREATE NONCLUSTERED INDEX [IDX04_${strTBL}] ON [dbo].[${strTBL}]
             (
              <foreach item="item" index="index" collection="arrS4" separator=",">
 	            [${item}] ASC

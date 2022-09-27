@@ -849,15 +849,16 @@
         const positionRenderData = document.querySelector('.details-modal-content')
         const dataRender = data[element.getAttribute('id')]
         let templatedData = ``
+        
         for (const key in dataRender) {
           if (Object.hasOwnProperty.call(dataRender, key)) {
             // create input type checkbox
-            if (key == 'primaryKey' || key == 'allowNulls') {
+            if (key == 'allowNulls') {
               templatedData += `
                 <div class="field-edit">
                   <label for="${key}">${key}</label>
                   <div class="input-checkbox">
-                  <input oninput="elementChangeInput(this.name, this.value)" type="checkbox" id="${key}" name="${key}" ${ dataRender[key] && dataRender[key]!=="null" ? 'checked' : ''} value="${dataRender[key]}">
+                  <input oninput="elementChangeInput(this.name, this.checked)" type="checkbox" id="${key}" name="${key}" ${ dataRender[key] && dataRender[key]!=="null" ? 'checked' : ''}>
                   </div>
                 </div>
                 <div class="space"></div>
@@ -899,19 +900,6 @@
           }
         }
         positionRenderData.innerHTML = templatedData + '<p class="isvalid"></p>' + `<div class="button" id="save-data-change">Save</div>`
-
-        // addEventListener change on checkbox input
-        for (const key in dataRender) {
-          if (Object.hasOwnProperty.call(dataRender, key)) {
-            if(key === 'primaryKey' || key === 'allowNulls') {
-              const checkbox = document.querySelector('#' + key);
-              checkbox.addEventListener('change',  () => {
-                checkbox.value = checkbox.checked ? 1 : 0;
-              });
-            }
-          }
-        }
-
         const saveDataChange = document.querySelector('#save-data-change')
         saveDataChange.addEventListener('click', closeTheModalPopup)
       })
@@ -934,7 +922,7 @@
       .then((response) => {
         if (response.data.message === "SUCCESS") {
           alert('Update Table Successful')
-          location.reload();
+          // location.reload();
         } 
         if (response.data.statusCode === 400) {
           const errorMessage = response.data.errorMessage
@@ -966,7 +954,7 @@
         if (key == 'tableColInfos' || key == 'fieldKey') {
           // tableColInfo ko render ra table
           continue
-        } else if (key == 'primaryKey' || key == 'allowNulls') {
+        } else if (key == 'allowNulls') {
           subElement += `<td><input type="checkbox" ${value && value!== "null" ? 'checked' : ''} disabled="true" /></td>`
         } else {
           subElement += `<td><div class="content">${value}</div></td>`
@@ -1545,6 +1533,7 @@
     // check value size
     const regExNumber = /^null|\s|\d$/
     const fieldNumber = ["size" , "primaryKey" , "keyS1" , "keyS2" , "keyS3" , "keyS4"]
+    const fieldKeyS = ["keyS1" , "keyS2" , "keyS3" , "keyS4"]
     if (fieldNumber.includes(nameField)) {
       if (nameField === "size") {
         const checkDataType = document.querySelector('#dataType')
@@ -1622,7 +1611,38 @@
         elementEditorSelected.style.borderColor = "green"
         toggleStatus(blockEditor, 'not-isvalid', 'isvalid', '')
       }
-    } 
+    }
+    if (nameField === "primaryKey") {
+      addOrRemoveFieldKey('p', valueField)
+      if (valueField) {
+        document.querySelector('#allowNulls').checked = true
+        document.querySelector('#allowNulls').setAttribute("value", "1")
+      } else {
+        document.querySelector('#allowNulls').checked = false
+        document.querySelector('#allowNulls').setAttribute("value", "0")
+      }
+    }
+    if (nameField === "keyS1") {
+      addOrRemoveFieldKey('s1', valueField)
+    }
+    if (nameField === "keyS2") {
+      addOrRemoveFieldKey('s2', valueField)
+    }
+    if (nameField === "keyS3") {
+      addOrRemoveFieldKey('s3', valueField)
+    }
+    if (nameField === "keyS4") {
+      addOrRemoveFieldKey('s4', valueField)
+    }
+    if (nameField === "allowNulls") {
+      if (document.querySelector('#primaryKey').value) {
+        document.querySelector('#allowNulls').checked = true
+        document.querySelector('#allowNulls').setAttribute("value", "1")
+      } else {
+        document.querySelector('#allowNulls').checked ? document.querySelector('#allowNulls').setAttribute("value", "1") : document.querySelector('#allowNulls').setAttribute("value", "0")
+      }
+      
+    }
   }
   
 
@@ -1632,6 +1652,22 @@
     isvalid.classList.remove(`${classRemove}`)
     isvalid.classList.add(`${classAdd}`)
     isvalid.innerHTML = `${content}`
+  }
+
+  // add or remove fieldKey
+  const addOrRemoveFieldKey = (keyname, action) => {
+    if (action) {
+        // if field don't exist in primary key => add
+        if (!dataBaseSelected[0].tableInfo.fieldKey[keyname].includes(document.querySelector('#columnDefineName').value)) {
+          dataBaseSelected[0].tableInfo.fieldKey[keyname].push(document.querySelector('#columnDefineName').value)
+        }
+      } else {
+        // if field exist in primary key => remove
+        if (dataBaseSelected[0].tableInfo.fieldKey[keyname].includes(document.querySelector('#columnDefineName').value)) {
+          const index = dataBaseSelected[0].tableInfo.fieldKey[keyname].indexOf(document.querySelector('#columnDefineName').value)
+          dataBaseSelected[0].tableInfo.fieldKey[keyname].splice(index, 1)
+        }
+      }
   }
 
 </script>

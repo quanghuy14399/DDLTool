@@ -117,28 +117,30 @@ let createTableMst = async (resBody) => {
       strDRPIDX01 += await getStrDropIndex(
         chkExistTable,
         "IDX01",
-        resBody.tableName
+        resBody.tableDefinitionName
       );
     }
     if (resBody.fieldKey.s2.length > 0) {
+      console.log('check s2 co');
       strDRPIDX02 += await getStrDropIndex(
         chkExistTable,
         "IDX02",
-        resBody.tableName
+        resBody.tableDefinitionName
       );
+      console.log('check strDRPIDX02', strDRPIDX02);
     }
     if (resBody.fieldKey.s3.length > 0) {
       strDRPIDX03 += await getStrDropIndex(
         chkExistTable,
         "IDX03",
-        resBody.tableName
+        resBody.tableDefinitionName
       );
     }
     if (resBody.fieldKey.s4.length > 0) {
       strDRPIDX04 += await getStrDropIndex(
         chkExistTable,
         "IDX04",
-        resBody.tableName
+        resBody.tableDefinitionName
       );
     }
     return {
@@ -165,10 +167,10 @@ let createTableMst = async (resBody) => {
 
 const getStrDropIndex = async (chkFlag, strIdx, tableName) => {
   let strDRPIDX = "";
-  if (chkFlag === 1) {
-    strDRPIDX += sqlConstant.CNS_DRPIDX + strIdx + tableName;
+  if (chkFlag == 1) {
+    strDRPIDX = sqlConstant.CNS_DRPIDX + strIdx + "_" + tableName;
   } else {
-    strDRPIDX += sqlConstant.CNS_DRPIDX02 + strIdx + tableName;
+    strDRPIDX = sqlConstant.CNS_DRPIDX02 + strIdx + "_" + tableName;
   }
   strDRPIDX += sqlConstant.CNS_CRE2 + tableName + sqlConstant.CNS_KK2;
   return strDRPIDX;
@@ -179,6 +181,7 @@ const executeTableRegistrationService = async (req) => {
   try {
     for (const iterator of req.body) {
       const tableColInfo = await createTableMst(iterator);
+      console.log(tableColInfo, 'tableColInfo index2');
       const result =
         await tableRegistrationReposistory.executeTableRegistrationRepository(
           tableColInfo
