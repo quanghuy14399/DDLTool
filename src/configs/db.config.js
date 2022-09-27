@@ -1,6 +1,5 @@
 const { query } = require("express");
 const sql = require("mssql/msnodesqlv8");
-const localSql = require("mssql/msnodesqlv8");
 
 const appDBConfig = {
   user: "sa",
@@ -15,7 +14,7 @@ const appDBConfig = {
 
 let getDBServerTime = async () => {
   try {
-    const conn = await localSql.connect(appDBConfig);
+    const conn = await sql.connect(appDBConfig);
     console.log("connecting to server...");
     const result = await conn.query(
       " SELECT CURRENT_TIMESTAMP AS CURRENT_SERVERTIME ;"
@@ -36,7 +35,7 @@ let getDBServerTime = async () => {
 
 const excuteScript = async (sqlQuery) => {
   try {
-    const conn = await localSql.connect(appDBConfig);
+    const conn = await sql.connect(appDBConfig);
     console.log("Query executing...");
     const result = await conn.query(sqlQuery);
     conn.close();
