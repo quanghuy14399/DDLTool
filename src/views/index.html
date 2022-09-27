@@ -1203,6 +1203,8 @@
   const processFileLoading = document.querySelector('.process-file .lds-ring')
   // btn-save-table
   let controlRender = 0
+  let success = 0
+  let fail = 0
   const btnSaveTable = document.querySelector('#btn-save-table')
   btnSaveTable.addEventListener('click', async () => {
     controlRender++
@@ -1216,10 +1218,12 @@
     await Promise.all(
       allFieldsTB.map( async (iterator, index, arr) => {
         const tableTemp = [iterator]
+        
         const checkRes = await asyncFunc(tableTemp, notification, iterator.tableDefinitionName).then((result) => {
           // console.log(result.length, '-', arr.length);
           if (result.length === arr.length) {
-            let temp = ``
+            let temp = `<p>Success: ${success}</p>
+                        <p>Fail: ${fail}</p>`
             for (const title of notification) {
               temp += title
             }
@@ -1240,6 +1244,7 @@
                     .post("/table-registration", tableTemp)
                     .then((response) => {
                       if (response.data.message === "SUCCESS") {
+                        success++
                         notification.push(`<p style="color: green">${tableDefinitionName} was created<p>`)
                         return notification
                       } else {
@@ -1247,6 +1252,7 @@
                       }
                     })
                     .catch((error, response) => {
+                      fail++
                       notification.push(`<p style="color: red">${tableDefinitionName} ${error.response.data.errorMessage}</p>`)
                       return notification
                     })
