@@ -1490,7 +1490,7 @@
     if (!allFieldsTB) return
     for (const fieldTable of allFieldsTB) {
       fieldTable.excuteDate = toDay.toLocaleString()
-      fieldTable.databaseName = databaseName.value ? databaseName.value : 'SagawaTableCoreSystem'
+      fieldTable.databaseName = databaseName.value ? databaseName.value : 'SagawaCoreSystem'
       cmnItemFlg.forEach((ele, index, arr) => {
         if (ele.checked) fieldTable.cmnItemFlg = ele.value
         if (index === arr.length -1) {
