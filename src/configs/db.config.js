@@ -1,7 +1,7 @@
 const { query } = require("express");
 const sql = require("mssql/msnodesqlv8");
 
-var configDefault = {
+const configDefault = {
   user: process.env.USER || "sa",
   password: process.env.PASSWORD || "123456",
   database: process.env.DATABASE || "SagawaTableCoreSystem",
@@ -53,12 +53,12 @@ const excuteScript = async (sqlQuery) => {
   }
 };
 
-const createOrUpdateTable = async (sqlQuery, schemaName) => {
+const createOrUpdateTable = async (sqlQuery, dbName) => {
   // console.log("AAAAAAAAAAA", configDefault.database);
   var config = {
     user: process.env.USER || "sa",
     password: process.env.PASSWORD || "123456",
-    database: schemaName,
+    database: dbName,
     driver: process.env.DRIVER || "msnodesqlv8",
     server: process.env.SERVER || "localhost",
     options: {

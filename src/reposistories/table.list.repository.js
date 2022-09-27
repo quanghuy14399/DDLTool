@@ -43,9 +43,10 @@ const insertTableListRepository = async (req) => {
       req,
       FORMAT
     );
-    console.log("insert table list sql query: ", strSql);
+    const strSqlConverted = strSql.replace(/N+\s+\'/g, `N'`)
+    console.log("insert table list sql query: ", strSqlConverted);
     const result = await dbConfig.excuteScript(
-      strSql.replace(/N+\s+\'/g, `N'`)
+      strSqlConverted
     );
 
     return {
