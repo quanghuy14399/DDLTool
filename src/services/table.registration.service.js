@@ -171,7 +171,6 @@ const executeTableRegistrationService = async (req) => {
   try {
     
     for (const iterator of req.body) {
-      console.log(iterator, 'ahihi');
       const tableColInfo = await createTableMst(iterator);
       const result =
         await tableRegistrationReposistory.executeTableRegistrationRepository(
@@ -187,8 +186,14 @@ const executeTableRegistrationService = async (req) => {
         };
         return await tableListReposistory.insertTableListRepository(insertParams);
       }else{
-        console.log('toiws ddaau k', result);
-        return result;
+        return {
+          httpStatuscode: 200,
+          data: {
+            statusCode: result.httpStatuscode,
+            errorCode: result.data.errorCode,
+            errorMessage:  result.data.errorMessage,
+          },
+        };
       }
     }
     // await req.body.forEach(async (element) => {
@@ -197,8 +202,9 @@ const executeTableRegistrationService = async (req) => {
   } catch (error) {
     console.log(" Table registration service ERROR!!!", error.message);
     return {
-      httpStatuscode: 400,
+      httpStatuscode: 200,
       data: {
+        statusCode: 400,
         errorCode: "SQL-ERROR",
         errorMessage: error.message,
       },

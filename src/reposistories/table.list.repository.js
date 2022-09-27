@@ -60,8 +60,9 @@ const insertTableListRepository = async (req) => {
   } catch (error) {
     console.error("insert list repository ERROR!", error.message);
     return {
-      httpStatuscode: 400,
+      httpStatuscode: 200,
       data: {
+        statusCode : 400,
         message:"ERROR",
         errorCode: "SQL-ERROR",
         errorMessage: error.message,

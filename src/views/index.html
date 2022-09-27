@@ -797,6 +797,7 @@
         // console.log(response.data, 'done processing')
         const historyTable = response.data.map((element) => {
           return {
+            version: element.version,
             tableDefinitionName: element.tableInfo.tableDefinitionName,
             tableName: element.tableInfo.tableName,
             databaseName: element.databaseName,
@@ -806,7 +807,6 @@
             updateUserId: element.updateUserId,
             updateDateTime: new Date(element.updateDateTime),
             excuteDate: element.tableInfo.excuteDate,
-            version: element.version,
           }
         })
         // render table all from DB
@@ -852,12 +852,12 @@
         for (const key in dataRender) {
           if (Object.hasOwnProperty.call(dataRender, key)) {
             // create input type checkbox
-            if (key === 'primaryKey' || key === 'allowNulls') {
+            if (key == 'primaryKey' || key == 'allowNulls') {
               templatedData += `
                 <div class="field-edit">
                   <label for="${key}">${key}</label>
                   <div class="input-checkbox">
-                  <input oninput="elementChangeInput(this.name, this.value)" type="checkbox" id="${key}" name="${key}" ${dataRender[key] === '1' ? 'checked' : ''} value="${dataRender[key]}">
+                  <input oninput="elementChangeInput(this.name, this.value)" type="checkbox" id="${key}" name="${key}" ${ dataRender[key] && dataRender[key]!=="null" ? 'checked' : ''} value="${dataRender[key]}">
                   </div>
                 </div>
                 <div class="space"></div>
@@ -920,7 +920,7 @@
   
   // catch click btn-re-execute
   const eventSaveTable = document.querySelector("#btn-re-execute")
-  eventSaveTable.addEventListener("click", () => {
+  eventSaveTable.addEventListener("click", async () => {
     // console.log('clicked btn-re-execute', dataBaseSelected);
     // const dataExecute = JSON.stringify(dataBaseSelected);
     dataBaseSelected[0].tableInfo.tableColInfos.forEach((element) => {
@@ -929,17 +929,24 @@
       }
     })
     const payload = [dataBaseSelected[0].tableInfo]
-    axios
+    await axios
       .post("/table-registration", payload)
       .then((response) => {
         if (response.data.message === "SUCCESS") {
           alert('Update Table Successful')
           location.reload();
+        } 
+        if (response.data.statusCode === 400) {
+          const errorMessage = response.data.errorMessage
+          if (errorMessage) {
+            popupMessageElement.style.display = 'block'
+            const positionRenderData = popupMessageElement.querySelector('.details-modal-content')
+            positionRenderData.innerText = errorMessage
+          }
+            
         }
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    
   });
   
   const renderTable = (datas, tbody, thead) => {
@@ -956,11 +963,11 @@
         let value = dataTemp[key];
         if (index === 0)
           nameHeader.push(key)
-        if (key === 'tableColInfos' || key === 'fieldKey') {
+        if (key == 'tableColInfos' || key == 'fieldKey') {
           // tableColInfo ko render ra table
           continue
-        } else if (key === 'primaryKey' || key === 'allowNulls') {
-          subElement += `<td><input type="checkbox" ${value === '1' ? 'checked' : ''} disabled="true" /></td>`
+        } else if (key == 'primaryKey' || key == 'allowNulls') {
+          subElement += `<td><input type="checkbox" ${value && value!== "null" ? 'checked' : ''} disabled="true" /></td>`
         } else {
           subElement += `<td><div class="content">${value}</div></td>`
         }

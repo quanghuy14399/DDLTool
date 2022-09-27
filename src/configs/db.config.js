@@ -4,7 +4,7 @@ const sql = require("mssql/msnodesqlv8");
 const appDBConfig = {
   user: "sa",
   password: "123456",
-  database: "SagawaTableCoreSystem",
+  database: "SagawaCoreSystem",
   driver: "msnodesqlv8",
   server: "localhost",
   options: {
@@ -23,13 +23,11 @@ let getDBServerTime = async () => {
       result.recordset[0].CURRENT_SERVERTIME,
       "Server connected succesfully !!!"
     );
-    sql.close();
     return {
       data: result.recordset[0].CURRENT_SERVERTIME,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not connect to server ");
-    sql.close();
   }
 };
 
@@ -38,17 +36,16 @@ const excuteScript = async (sqlQuery) => {
     await sql.connect(appDBConfig);
     console.log("Query executing...");
     const result = await sql.query(sqlQuery);
-    sql.close();
     return {
       httpStatuscode: 200,
       data: result.recordset,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not execute the query ");
-    sql.close();
     return {
-      httpStatuscode: 400,
+      httpStatuscode: 200,
       data: {
+        statusCode:400,
         message: "ERROR",
         errorCode: "SQL-ERROR",
         errorMessage: err.message,
@@ -73,14 +70,12 @@ const createOrUpdateTable = async (sqlQuery, dbName) => {
     await sql.connect(dbConfig);
     console.log("Query executing...");
     const result = await sql.query(`${sqlQuery}`);
-    sql.close();
     return {
       httpStatuscode: 200,
       data: result.recordset,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not create table ");
-    sql.close();
     return {
       httpStatuscode: 400,
       data: {
