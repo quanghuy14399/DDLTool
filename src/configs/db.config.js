@@ -14,38 +14,38 @@ const appDBConfig = {
 
 let getDBServerTime = async () => {
   try {
-    const conn = await sql.connect(appDBConfig);
+    await sql.connect(appDBConfig);
     console.log("connecting to server...");
-    const result = await conn.query(
+    const result = await sql.query(
       " SELECT CURRENT_TIMESTAMP AS CURRENT_SERVERTIME ;"
     );
     console.log(
       result.recordset[0].CURRENT_SERVERTIME,
       "Server connected succesfully !!!"
     );
-    conn.close();
+    sql.close();
     return {
       data: result.recordset[0].CURRENT_SERVERTIME,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not connect to server ");
-    conn.close();
+    sql.close();
   }
 };
 
 const excuteScript = async (sqlQuery) => {
   try {
-    const conn = await sql.connect(appDBConfig);
+    await sql.connect(appDBConfig);
     console.log("Query executing...");
-    const result = await conn.query(sqlQuery);
-    conn.close();
+    const result = await sql.query(sqlQuery);
+    sql.close();
     return {
       httpStatuscode: 200,
       data: result.recordset,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not execute the query ");
-    conn.close();
+    sql.close();
     return {
       httpStatuscode: 400,
       data: {
@@ -70,17 +70,17 @@ const createOrUpdateTable = async (sqlQuery, dbName) => {
     },
   };
   try {
-    const conn = await sql.connect(dbConfig);
+    await sql.connect(dbConfig);
     console.log("Query executing...");
-    const result = await conn.query(`${sqlQuery}`);
-    conn.close();
+    const result = await sql.query(`${sqlQuery}`);
+    sql.close();
     return {
       httpStatuscode: 200,
       data: result.recordset,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not create table ");
-    conn.close();
+    sql.close();
     return {
       httpStatuscode: 400,
       data: {
