@@ -1,12 +1,13 @@
 const { query } = require("express");
 const sql = require("mssql/msnodesqlv8");
+const localSql = require("mssql/msnodesqlv8");
 
-const configDefault = {
-  user: process.env.USER || "sa",
-  password: process.env.PASSWORD || "123456",
-  database: process.env.DATABASE || "SagawaTableCoreSystem",
+const appDBConfig = {
+  user: "sa",
+  password: "123456",
+  database: "SagawaTableCoreSystem",
   driver: "msnodesqlv8",
-  server: process.env.SERVER || "localhost",
+  server: "localhost",
   options: {
     trustServerCertificate: true, // change to true for local dev / self-signed certs
   },
@@ -14,34 +15,38 @@ const configDefault = {
 
 let getDBServerTime = async () => {
   try {
-    await sql.connect(configDefault);
+    const conn = await localSql.connect(appDBConfig);
     console.log("connecting to server...");
-    const result = await sql.query(
+    const result = await conn.query(
       " SELECT CURRENT_TIMESTAMP AS CURRENT_SERVERTIME ;"
     );
     console.log(
       result.recordset[0].CURRENT_SERVERTIME,
       "Server connected succesfully !!!"
     );
+    conn.close();
     return {
       data: result.recordset[0].CURRENT_SERVERTIME,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not connect to server ");
+    conn.close();
   }
 };
 
 const excuteScript = async (sqlQuery) => {
   try {
-    await sql.connect(configDefault);
+    const conn = await localSql.connect(appDBConfig);
     console.log("Query executing...");
-    const result = await sql.query(sqlQuery);
+    const result = await conn.query(sqlQuery);
+    conn.close();
     return {
       httpStatuscode: 200,
       data: result.recordset,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not execute the query ");
+    conn.close();
     return {
       httpStatuscode: 400,
       data: {
@@ -55,7 +60,7 @@ const excuteScript = async (sqlQuery) => {
 
 const createOrUpdateTable = async (sqlQuery, dbName) => {
   // console.log("AAAAAAAAAAA", configDefault.database);
-  var config = {
+  var dbConfig = {
     user: process.env.USER || "sa",
     password: process.env.PASSWORD || "123456",
     database: dbName,
@@ -66,19 +71,21 @@ const createOrUpdateTable = async (sqlQuery, dbName) => {
     },
   };
   try {
-    await sql.connect(config);
+    const conn = await sql.connect(dbConfig);
     console.log("Query executing...");
-    const result = await sql.query(`${sqlQuery}`);
+    const result = await conn.query(`${sqlQuery}`);
+    conn.close();
     return {
       httpStatuscode: 200,
       data: result.recordset,
     };
   } catch (err) {
     console.log(err.message, "ERROR ! Can not create table ");
+    conn.close();
     return {
       httpStatuscode: 400,
       data: {
-        message:"ERROR",
+        message: "ERROR",
         errorCode: "SQL-ERROR",
         errorMessage: err.message,
       },
