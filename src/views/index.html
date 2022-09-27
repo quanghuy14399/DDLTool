@@ -922,7 +922,7 @@
       .then((response) => {
         if (response.data.message === "SUCCESS") {
           alert('Update Table Successful')
-          // location.reload();
+          location.reload();
         } 
         if (response.data.statusCode === 400) {
           const errorMessage = response.data.errorMessage
