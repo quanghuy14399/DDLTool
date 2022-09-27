@@ -79,7 +79,11 @@ let createTableMst = async (resBody) => {
         element.dataType +
         sqlConstant.CNS_KK2;
 
-      if (element.size !== null && element.size !== "null" && element.size !== "") {
+      if (
+        element.size !== null &&
+        element.size !== "null" &&
+        element.size !== ""
+      ) {
         strCreteColumn +=
           sqlConstant.CNS_SPC +
           sqlConstant.CNS_KK3 +
@@ -151,12 +155,16 @@ let createTableMst = async (resBody) => {
       arrColumnInfos: resBody.tableColInfos,
       optSeqKeyFlg: optSeqKeyFlg,
       excuteDate: resBody.excuteDate,
+      strDRPIDX01: strDRPIDX01,
+      strDRPIDX02: strDRPIDX02,
+      strDRPIDX03: strDRPIDX03,
+      strDRPIDX04: strDRPIDX04,
     };
   } catch {}
 };
 
 const getStrDropIndex = async (chkFlag, strIdx, tableName) => {
-  strDRPIDX = "";
+  let strDRPIDX = "";
   if (chkFlag === 1) {
     strDRPIDX += sqlConstant.CNS_DRPIDX + strIdx + tableName;
   } else {
@@ -169,7 +177,6 @@ const getStrDropIndex = async (chkFlag, strIdx, tableName) => {
 const executeTableRegistrationService = async (req) => {
   console.log(" Start table registration service... ");
   try {
-    
     for (const iterator of req.body) {
       const tableColInfo = await createTableMst(iterator);
       const result =
@@ -184,20 +191,22 @@ const executeTableRegistrationService = async (req) => {
           description: iterator.remarks,
           tableInfo: iterator,
         };
-        return await tableListReposistory.insertTableListRepository(insertParams);
-      }else{
+        return await tableListReposistory.insertTableListRepository(
+          insertParams
+        );
+      } else {
         return {
           httpStatuscode: 200,
           data: {
             statusCode: result.httpStatuscode,
             errorCode: result.data.errorCode,
-            errorMessage:  result.data.errorMessage,
+            errorMessage: result.data.errorMessage,
           },
         };
       }
     }
     // await req.body.forEach(async (element) => {
-      
+
     // });
   } catch (error) {
     console.log(" Table registration service ERROR!!!", error.message);
