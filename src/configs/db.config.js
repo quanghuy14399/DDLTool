@@ -2,11 +2,11 @@ const { query } = require("express");
 const sql = require("mssql/msnodesqlv8");
 
 const appDBConfig = {
-  user: "sa",
-  password: "123456",
-  database: "SagawaCoreSystem",
-  driver: "msnodesqlv8",
-  server: "localhost",
+  user: process.env.USER || "sa",
+  password: process.env.PASSWORD || "123456",
+  database: process.env.DATABASE || "SagawaCoreSystem",
+  driver: process.env.DRIVER || "msnodesqlv8",
+  server: process.env.SERVER || "localhost",
   options: {
     trustServerCertificate: true, // change to true for local dev / self-signed certs
   },
