@@ -721,7 +721,7 @@
   positionClosePopup.addEventListener('click', () => {
     location.reload()
   })
-  // close the modal popup
+  // close and save the data of the popup edit information
   const closeTheModalPopup = () => {
     const elementData = popupElement.querySelectorAll('input')
     elementData.forEach((element) => {
@@ -746,11 +746,12 @@
     popupElement.style.display = 'none'
   }
 
-  // addEventListener 
+  // close popup edit information
   closePopupElement.addEventListener('click', () => {
     popupElement.style.display = 'none'
   });
 
+  // close file upload
   const closeFile = document.querySelector('.close-file-upload')
   closeFile.addEventListener('click', () => {
     const inputFileUploaded = document.querySelector('.uploaded')
@@ -830,8 +831,10 @@
         console.log(error);
       });
   }
+  // show existing data
   callDB()
 
+  // render content of popup edit information
   const catchElementClicked = (data) => {
     const elementClided = document.querySelectorAll('#customers.one tbody tr')
     elementClided.forEach((element, index) => {
@@ -898,7 +901,7 @@
     })
   }
   
-  // catch click btn-re-execute
+  // catch click btn-re-execute update information of existing table
   const eventSaveTable = document.querySelector("#btn-re-execute")
   eventSaveTable.addEventListener("click", async () => {
     // console.log('clicked btn-re-execute', dataBaseSelected);
@@ -929,6 +932,7 @@
     
   });
   
+  // render table from data and position table
   const renderTable = (datas, tbody, thead) => {
     let nameHeader = []
     let stringHeader = ``
@@ -974,11 +978,13 @@
     `
   }
 
+  // show table name and version of table selected
   const renderTableDetailName = (tableDetail) => {
     document.querySelector('#table-name').innerHTML = tableDetail.tableInfo.tableName
     document.querySelector('#table-version').innerHTML = tableDetail.version
   }
   
+  // search table name exist in テーブル一覧
   const searchNameTable = async (sheetNames) => {
     const data = []
     const listTemp = []
@@ -1017,7 +1023,7 @@
     return data
   }
   // listTableTemp
-  
+
   const readFile = async () => {
     const inputFileUI = document.querySelector('.border-upload')
     inputFileUI.style.display = 'none'
@@ -1030,6 +1036,7 @@
     const input = document.getElementById('input')
     const tbField = {}
     if (!input.files[0]) return
+    // list all sheet
     const sheetNames = await readXlsxFile(input.files[0], {
       getSheets: true
     }).then(function (sheets) {
@@ -1110,6 +1117,7 @@
     return value === null ? '' : value
   }
 
+  // get and sort index field key
   const getDataOfFieldKey = (value) => {
     const KEY_P_S = [35, 37, 39, 41, 43]
     const keyP = []
@@ -1172,6 +1180,7 @@
     return data
   }
 
+  // get data field of table
   const getDataOfField = (value) => {
     // const POSITION = [3, 16, 26, 30, 33, 35, 37, 39, 41, 43, 45, 48, 51, 54] //có dùng từ viết tắt
     const POSITION = [3, 16, 26, 30, 35, 37, 39, 41, 43, 45, 48, 51, 54]
@@ -1240,6 +1249,7 @@
     
   })
 
+  //create multi table
   const asyncFunc = async (tableTemp, notification, tableDefinitionName) => {
     try {
       return await axios
@@ -1517,7 +1527,6 @@
   }
 
   // check validation
-  
   const elementChangeInput = (nameField, valueField) => {
     const blockEditor = document.querySelector(`.details-modal-content`)
 
@@ -1654,7 +1663,7 @@
     }
   }
   
-
+  // toggle validate border color and remove error text
   const toggleStatus = (parent, classRemove, classAdd, content) => {
     const isvalid = parent.querySelector(`.${classRemove}`)
     if (!!!isvalid) return
